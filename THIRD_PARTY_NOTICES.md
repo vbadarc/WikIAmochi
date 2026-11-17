@@ -43,8 +43,8 @@ Los siguientes componentes se utilizan únicamente en el entorno local de escrit
 | Componente | Licencia | Estado en Android | Notas de Auditoría |
 | :--- | :--- | :--- | :--- |
 | **Piper TTS (`piper.exe`, `espeak-ng`, `onnxruntime`)** | `MIT` / `GPL-3.0` | **Excluido** | Binarios Win32 locales en `resources/app/bin/piper/` |
-| **Modelo `es_ES-sharvard-medium.onnx`** | `CC BY 3.0` | **Excluido de Android** | Basado en el corpus *Sharvard* (V. Aubanel, M. L. García Lecumberri, M. Cooke, 2014) |
-| **Modelo `es_MX-claude-high.onnx`** | Licencia comunitaria con linaje de entrenamiento no verificado | **Excluido de Android** | Uso restringido a pruebas locales; no se redistribuye en Play Store |
+| **Modelo `es_ES-sharvard-medium.onnx`** | **NO VERIFICADO** *(sin fuente primaria abierta verificada en local)* | **Excluido de Android y de Git** | Uso local de escritorio; no se incluye ni redistribuye en el paquete de Android |
+| **Modelo `es_MX-claude-high.onnx`** | **NO VERIFICADO** *(linaje de entrenamiento sin fuente primaria verificada)* | **Excluido de Android y de Git** | Uso local de escritorio; no se incluye ni redistribuye en el paquete de Android |
 | **Paquete `msedge-tts` y `voice_cache/*.mp3`** | Código `MIT`, pero el servicio online está sujeto al Contrato de Servicios de Microsoft | **Excluido de Android y de Git** | El servicio consumidor *Read Aloud* de Microsoft Edge no autoriza redistribuir grabaciones pre-generadas dentro de aplicaciones en tiendas de terceros |
 
 ---

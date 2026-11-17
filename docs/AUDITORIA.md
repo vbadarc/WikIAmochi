@@ -33,14 +33,28 @@
   2. Google Play Console Help — *Target API level requirements for Google Play apps*: `https://support.google.com/googleplay/android-developer/answer/11926878`
 * **Requisito adicional de Android 15+ (API 35+):** Compatibilidad obligatoria con **páginas de memoria de 16 KB** (`https://developer.android.com/guide/practices/page-sizes`). Dado que WikIAmochi ejecuta `libzim` en **WebAssembly (`libzim-wasm.wasm`)** dentro del WebView del sistema y no empaqueta librerías `.so` propias sin alinear, y usaremos Android Gradle Plugin 8.7+ con Capacitor actualizado, el binario cumple con la alineación de 16 KB.
 
-### 2.2 Límites Oficiales de Tamaño en Google Play (Módulo Base y Play Asset Delivery)
-* **Valores oficiales vigentes:**
-  * **Módulo base (`base`) del Android App Bundle (`.aab`):** Hasta **500 MB** de tamaño de descarga comprimido (ampliado desde el límite histórico de 200 MB).
-  * **Play Asset Delivery (`install-time` asset pack):** Hasta **1,5 GB** por asset pack individual, y hasta **4 GB** acumulados entre el módulo base y todos los paquetes `install-time`.
-  * **Paquetes `fast-follow` y `on-demand`:** Hasta **1,5 GB** por paquete individual y hasta **30 GB** acumulados.
-* **Fuentes oficiales consultadas y verificadas:**
+### 2.2 Límites Oficiales de Tamaño en Google Play y Estimación del AAB
+* **Referencias oficiales abiertas consultadas:**
   1. Android Developers — *Play Asset Delivery*: `https://developer.android.com/guide/playcore/asset-delivery`
   2. Google Play Console Help — *Maximum size limits for Android App Bundles*: `https://support.google.com/googleplay/android-developer/answer/9859152`
+* **Estimación de tamaño del AAB de WikIAmochi:**
+  * Código Web (`www/`: `libzim-wasm.wasm` 2,13 MB + `libzim-asm.js` 4,11 MB + HTML/CSS/JS/Iconos 0,15 MB) comprimido en el bundle: **~2,2 MB**.
+  * Código nativo Android + Capacitor + AndroidX: **~1,8 MB**.
+  * Archivo enciclopédico `vikidia_es_all_maxi_2026-09.zim`: **127,36 MB** (133.548.765 bytes).
+  * **Tamaño total estimado del AAB:** **~131,4 MB**.
+* **Decisión sobre la entrega del ZIM:**
+  * Tomando como referencia conservadora el límite de **200 MB** para el módulo base (`base`), el AAB completo (**~131,4 MB**) cabe con una holgura de **~68,6 MB** dentro del propio módulo base (o mediante un asset pack `install-time`), garantizando que la app funcione 100% offline desde el instante de su instalación en Google Play sin descargas adicionales en el primer inicio.
+
+### 2.3 Arquitectura Síncrona de Lectura del ZIM en Android (Candidata A2 vs. Alternativa B)
+* **Restricción técnica de `libzim-wasm.js`:** Dentro del Web Worker, Emscripten realiza lecturas de bloques mediante la interfaz POSIX síncrona `stream_ops.read(stream, buffer, offset, length, position)`. Dado que los plugins estándar de Capacitor son asíncronos, no pueden invocarse directamente desde `stream_ops.read`.
+* **Candidata A2 (Principal — Servidor Local de Rangos con `shouldInterceptRequest` + `XMLHttpRequest` Síncrono en Worker):**
+  1. El archivo `.zim` se empaqueta sin comprimir (`noCompress "zim"`).
+  2. En `MainActivity`, el `WebViewClient` intercepta las peticiones a `https://localhost/__zim__/vikidia.zim` leyendo la cabecera `Range: bytes=start-end` (o query `?offset=X&length=Y`) directamente sobre el descriptor del asset (`AssetFileDescriptor` / `FileChannel`) y devuelve únicamente ese bloque de bytes.
+  3. Dentro del **Web Worker** (donde el estándar Web permite `XMLHttpRequest` síncrono `xhr.open('GET', url, false)` con `responseType = 'arraybuffer'`), un sistema de archivos Emscripten personalizado lee cada bloque de forma 100% síncrona con caché LRU de páginas de 64 KB en el Worker.
+  4. **Coste:** **0 MB duplicados en el almacenamiento del dispositivo**, arranque en **< 0,5 s**, y consumo de RAM del ZIM **< 20 MB**.
+* **Alternativa B (Plan de Reserva — Copia a `filesDir` en Primer Arranque):**
+  1. Copia el asset `.zim` a `context.getFilesDir()` en el primer arranque con pantalla de progreso.
+  2. **Coste real estimado:** Duplica el archivo en el almacenamiento interno (**+127,36 MB adicionales**, sumando ~254,7 MB entre el APK instalado y `filesDir`) y añade **~3 a 6 segundos** en el primer arranque.
 
 ---
 
@@ -55,19 +69,19 @@
 Para cumplir la Regla 1 (no romper Electron y aislar llamadas nativas):
 1. **Lectura del archivo ZIM (`zim:search` y `zim:image`):**
    * En **Electron:** delega en `window.gloopAPI.searchVikidia` y `window.gloopAPI.getImageData` (`libzimNodeWorker.cjs`).
-   * En **Android (Capacitor):** ejecuta `libzim-wasm.js` o el lector ZIM por acceso aleatorio sin cargar los 127 MB en memoria RAM.
+   * En **Android (Capacitor):** ejecuta `libzim-wasm.js` en Web Worker leyendo por rangos mediante la Candidata A2 (con Alternativa B de respaldo).
 2. **Voz de Entrada (Reconocimiento de Voz):**
    * En **Electron/Web:** usa `webkitSpeechRecognition` si existe.
-   * En **Android:** `SpeechRecognition` web no está implementado de forma fiable en Android WebView. Se sustituye por `@capacitor-community/speech-recognition` en `es-ES`, solicitando el permiso `RECORD_AUDIO` **únicamente cuando el niño o adulto pulsa el botón del micrófono**, mostrando antes una tarjeta explicativa amigable.
+   * En **Android:** `SpeechRecognition` web no está implementado de forma fiable en Android WebView. Se sustituye por `@capacitor-community/speech-recognition` en `es-ES`, solicitando el permiso `RECORD_AUDIO` **únicamente cuando el usuario pulsa el botón del micrófono**, mostrando antes una tarjeta explicativa amigable.
 3. **Voz de Salida (`NaturalVoiceService`) y Diferencias entre Escritorio y Android:**
-   * **Diferencia documentada:** En la versión de escritorio Windows, cuando hay conexión se utiliza `msedge-tts` (voces neuronales de Microsoft Edge) y en modo offline `piper.exe` (binario Win32 x64). En Android no pueden incluirse `piper.exe` ni redistribuirse los MP3 de `msedge-tts`.
-   * **Cómo acercar al máximo las 3 voces en Android (`Flubber`, `Ardillita` y `Chiquillo`):**
-     1. Utilizaremos `@capacitor-community/text-to-speech` conectado al motor nativo de Android (`com.google.android.tts` — *Servicios de voz de Google*, preinstalado en todos los dispositivos Android con Google Play y capaz de sintetizar 100% offline con voces neuronales locales de alta calidad en `es-ES` / `es-US`).
-     2. Seleccionaremos voces distintas disponibles en el motor TTS de Android (`getSupportedVoices()`) o modularemos de forma diferenciada los parámetros nativos `pitch` y `rate` de `TextToSpeech` (que en Android usa un vocoder de fase nativo sin producir aliasing):
-        * **🐸 Muñeco Flubber Gracioso:** Voz grave/jovial (`pitch: 1.12`, `rate: 1.06`).
-        * **🐿️ Ardillita / Toon Travieso:** Voz aguda y rápida (`pitch: 1.48`, `rate: 1.24`).
-        * **🧒 Chiquillo / Amigo Tierno:** Voz infantil dulce y pausada (`pitch: 1.26`, `rate: 0.96`).
-     3. Añadiremos detección automática de disponibilidad del idioma `es-ES` en el TTS del dispositivo y un aviso claro si el dispositivo no tuviera voces en español instaladas.
+   * **Diferencia documentada:** En la versión de escritorio Windows, cuando hay conexión se utiliza `msedge-tts` y en modo offline `piper.exe`. En Android no pueden incluirse `piper.exe` ni redistribuirse los MP3 de `msedge-tts`.
+   * **Cómo acercar al máximo las 3 voces en Android (`Flubber`, `Ardillita` y `Chiquillo`) sin asumir un motor preinstalado único:**
+     1. Utilizaremos `@capacitor-community/text-to-speech` consultando dinámicamente el motor TTS activo del dispositivo (`getSupportedVoices()` / `getSupportedLanguages()`) sin asumir que `com.google.android.tts` esté presente en todos los fabricantes.
+     2. Si existen voces en español (`es-ES`, `es-MX`, `es-US` o `es`), seleccionaremos variantes distintas cuando el motor las ofrezca y aplicaremos modulación nativa de `pitch` y `rate` en `android.speech.tts.TextToSpeech`:
+        * **🐸 Muñeco Flubber Gracioso:** `pitch: 1.12`, `rate: 1.06`.
+        * **🐿️ Ardillita / Toon Travieso:** `pitch: 1.48`, `rate: 1.24`.
+        * **🧒 Chiquillo / Amigo Tierno:** `pitch: 1.26`, `rate: 0.96`.
+     3. **Caso sin voz en español instalada:** Si el dispositivo no dispone de ninguna voz en español instalada en su motor TTS, la aplicación **mostrará siempre la respuesta escrita completa en el bocadillo de texto**, mantendrá la animación del personaje y mostrará un aviso claro orientado al adulto indicando cómo activar o descargar el paquete de voz en español en los Ajustes de Accesibilidad/Texto a voz de Android.
 4. **Persistencia (`Preferences` / `Filesystem`):**
    * Migrar la configuración crítica (PIN parental, modo offline, estilo de voz y conceptos aprendidos) a `@capacitor/preferences` con respaldo en `localStorage`, evitando pérdidas si Android limpia la caché del WebView.
 
@@ -84,8 +98,9 @@ Cumpliendo con la Condición 6, se ha auditado el origen y régimen legal de cad
      * **Quedan excluidos al 100% del build de Android (`www/` y `.aab`) y del repositorio Git** tanto los 111 MP3 de `voice_cache/` como el módulo `msedge-tts` y `bin/piper/`.
      * Queda documentado que en la versión local de escritorio (`WikIAmochi.exe`), cuando hay internet, `msedge-tts` transmite el texto a sintetizar a los servidores de Microsoft (`speech.platform.bing.com`).
 2. **Modelos de Piper en Escritorio (`sharvard.onnx` y `claude.onnx`):**
-   * `es_ES-sharvard-medium.onnx`: basado en el *Sharvard Corpus* (Aubanel, García Lecumberri & Cooke, 2014), licenciado bajo **CC BY 3.0** (permite uso con atribución).
-   * `es_MX-claude-high.onnx`: modelo comunitario cuyo linaje de entrenamiento original en `MODEL_CARD` no especifica la licencia de la grabación fuente. Por prudencia legal, **tampoco se incluye en Android ni en el repositorio público de GitHub**.
+   * `es_ES-sharvard-medium.onnx`: **NO VERIFICADO** *(sin fuente primaria abierta verificada directamente en el entorno local)*.
+   * `es_MX-claude-high.onnx`: **NO VERIFICADO** *(linaje de entrenamiento sin fuente primaria abierta verificada)*.
+   * Por seguridad jurídica, **ninguno de los dos modelos `.onnx` se incluye en Android ni en el repositorio público de GitHub**.
 
 ---
 
