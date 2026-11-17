@@ -1,0 +1,12 @@
+{
+  "appId": "com.wikiamochi.app",
+  "appName": "WikIAmochi",
+  "webDir": "resources/app",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
+

@@ -1,0 +1,48 @@
+# Dependencias Node / NPM
+node_modules/
+resources/app/node_modules/
+package-lock.json
+resources/app/package-lock.json
+
+# Binarios de escritorio Windows y Electron (>100 MB)
+*.exe
+*.lnk
+*.dll
+*.pak
+*.dat
+*.bin
+locales/
+LICENSES.chromium.html
+version
+vk_swiftshader_icd.json
+resources/app/bin/
+bin/
+
+# Archivos de contenido enciclopédico ZIM (>100 MB)
+*.zim
+
+# Caché de audio generada por msedge-tts y memoria dinámica local
+resources/app/voice_cache/
+resources/app/learned_knowledge.json
+
+# Artefactos de build web generado para Capacitor (solo en la raíz)
+/www/
+
+# Credenciales, firmas y configuración local de Android (NUNCA subir al repo)
+*.keystore
+*.jks
+keystore.properties
+local.properties
+
+# Compilación Android / Gradle
+android/build/
+android/app/build/
+android/.gradle/
+android/captures/
+*.apk
+*.aab
+
+# Registros y archivos del sistema operativo
+*.log
+.DS_Store
+Thumbs.db

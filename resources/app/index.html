@@ -1,0 +1,1675 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WikIAmochi - Enciclopedia Inteligente para Niños</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="alternate icon" type="image/png" href="icon.png">
+    <style>
+        :root {
+            --brand-green: #00E676;
+            --brand-blue: #00B0FF;
+            --brand-purple: #7C4DFF;
+            --card-glass: rgba(255, 255, 255, 0.95);
+            --shadow-subtle: 0 8px 24px rgba(0, 77, 64, 0.08);
+            --shadow-float: 0 16px 40px rgba(0, 105, 92, 0.14);
+            --border-radius-xl: 32px;
+            --border-radius-pill: 9999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle at 12% 18%, #E1F5FE 0%, transparent 40%),
+                        radial-gradient(circle at 88% 22%, #FCE4EC 0%, transparent 42%),
+                        radial-gradient(circle at 80% 80%, #EDE7F6 0%, transparent 45%),
+                        radial-gradient(circle at 18% 82%, #E8F5E9 0%, transparent 45%),
+                        linear-gradient(160deg, #E8F4F8 0%, #F3E5F5 45%, #E8F8F5 80%, #FFFDE7 100%);
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Fredoka', 'Nunito', sans-serif;
+            color: #263238;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 960px;
+            height: 100vh;
+            margin: 0 auto;
+            background: linear-gradient(175deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 249, 255, 0.92) 35%, rgba(248, 245, 255, 0.94) 70%, rgba(255, 253, 235, 0.92) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: none;
+            box-shadow: 0 0 45px rgba(0, 150, 136, 0.10);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .top-navbar {
+            padding: 14px 18px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .status-pill {
+            background: white;
+            padding: 6px 14px;
+            border-radius: var(--border-radius-pill);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-subtle);
+            border: 1.5px solid rgba(0, 230, 118, 0.35);
+            font-size: 12px;
+            font-weight: 600;
+            color: #00796B;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+        }
+
+        .status-pill:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 14px rgba(0, 230, 118, 0.22);
+        }
+
+        .status-pill.online-mode {
+            border-color: rgba(0, 176, 255, 0.5);
+            color: #0277BD;
+            background: #F0F9FF;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            background: var(--brand-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--brand-green);
+            animation: pulse-dot 2s infinite ease-in-out;
+            flex-shrink: 0;
+        }
+
+        .status-dot.online-mode {
+            background: #00B0FF;
+            box-shadow: 0 0 10px #00B0FF;
+        }
+
+        /* Caja de Pregunta Mostrada */
+        .user-question-box {
+            display: none;
+            background: linear-gradient(135deg, #E0F2F1 0%, #E8F8F5 100%);
+            border-left: 4px solid #00B0FF;
+            padding: 7px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            animation: card-appear 0.3s ease;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .pill-btn {
+            background: white;
+            border: 1.5px solid #CFD8DC;
+            border-radius: var(--border-radius-pill);
+            padding: 6px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #607D8B;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pill-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Barra de Personalización de Color del Slime */
+        .color-palette-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 16px 2px;
+            z-index: 10;
+        }
+
+        .color-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .color-dot:active, .color-dot.active {
+            transform: scale(1.25);
+            border-color: #263238;
+        }
+
+        .tamagotchi-stage {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: -10px;
+        }
+
+        canvas#gloopCanvas {
+            width: 320px;
+            height: 320px;
+            cursor: grab;
+            filter: drop-shadow(0 14px 28px rgba(0, 200, 83, 0.2));
+            transition: filter 0.3s;
+        }
+
+        canvas#gloopCanvas:active {
+            cursor: grabbing;
+        }
+
+        .podium {
+            position: absolute;
+            bottom: 22px;
+            width: 210px;
+            height: 28px;
+            background: radial-gradient(ellipse at center, rgba(0, 230, 118, 0.45) 0%, rgba(167, 255, 235, 0.15) 60%, transparent 80%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: podium-glow 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes podium-glow {
+            from { transform: scale(0.95); opacity: 0.7; }
+            to { transform: scale(1.08); opacity: 1; }
+        }
+
+        .speech-card {
+            margin: 0 16px 10px;
+            background: linear-gradient(150deg, #FFFFFF 0%, #F4FBF7 55%, #EBF8F2 100%);
+            border-radius: 26px;
+            padding: 16px 20px;
+            border: 2px solid rgba(0, 230, 118, 0.4);
+            box-shadow: 0 14px 34px rgba(0, 150, 136, 0.12);
+            position: relative;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: card-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes card-appear {
+            from { transform: translateY(12px) scale(0.97); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .speech-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-source {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 12px;
+            border-radius: var(--border-radius-pill);
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .badge-source.curated {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .badge-source.online {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .speech-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Botón de Parar Voz destacado */
+        .btn-stop-speech {
+            display: none;
+            background: #FFEBEE;
+            border: 1.5px solid #FFCDD2;
+            color: #D32F2F;
+            border-radius: var(--border-radius-pill);
+            padding: 4px 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            align-items: center;
+            gap: 4px;
+            animation: pulse-stop 1.5s infinite;
+        }
+
+        @keyframes pulse-stop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .btn-stop-speech.active {
+            display: flex;
+        }
+
+        .sound-wave-icon {
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            background: #F1F8E9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .sound-wave-icon:active {
+            transform: scale(0.85);
+        }
+
+        .speech-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #1B5E20;
+            font-weight: 500;
+        }
+
+        .quick-categories-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin: 4px 10px 10px;
+            gap: 4px;
+        }
+
+        .quick-categories-wrap {
+            margin: 0;
+            padding: 4px 2px;
+            overflow-x: auto;
+            display: flex;
+            gap: 8px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+            cursor: grab;
+            user-select: none;
+            flex: 1;
+        }
+
+        .quick-categories-wrap.grabbing {
+            cursor: grabbing;
+            scroll-behavior: auto;
+        }
+
+        .scroll-arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 230, 118, 0.4);
+            background: linear-gradient(135deg, #FFFFFF 0%, #E8F5E9 100%);
+            color: #00796B;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            z-index: 5;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .scroll-arrow:hover {
+            background: #00E676;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .scroll-arrow:active {
+            transform: scale(0.92);
+        }
+
+        .quick-categories-wrap::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5FBF8 100%);
+            border: 1.5px solid rgba(0, 200, 83, 0.25);
+            border-radius: var(--border-radius-pill);
+            padding: 8px 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 77, 64, 0.05);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .category-chip:active {
+            transform: scale(0.92);
+            background: #E8F5E9;
+            border-color: var(--brand-green);
+        }
+
+        .bottom-dock {
+            margin-top: auto;
+            padding: 10px 16px 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 248, 255, 0.98) 100%);
+            border-top: 2px solid rgba(0, 230, 118, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-field-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input#queryInput {
+            width: 100%;
+            background: #F4FBF7;
+            border: 2px solid #C8E6C9;
+            border-radius: var(--border-radius-pill);
+            padding: 14px 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #004D40;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        input#queryInput:focus {
+            background: white;
+            border-color: var(--brand-green);
+            box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.15);
+        }
+
+        .mic-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6E40 0%, #FF3D00 100%);
+            border: none;
+            color: white;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 61, 0, 0.35);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .mic-btn.listening {
+            animation: pulse-mic 1.2s infinite ease-in-out;
+            background: linear-gradient(135deg, #FF1744 0%, #D50000 100%);
+        }
+
+        @keyframes pulse-mic {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.6); }
+            50% { transform: scale(1.15); box-shadow: 0 0 0 16px rgba(255, 23, 68, 0); }
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00E676 0%, #00B248 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 200, 83, 0.3);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .send-btn:active {
+            transform: scale(0.9);
+        }
+
+        .sensor-action-strip {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .action-chip {
+            flex: 1;
+            padding: 8px 4px;
+            background: #F4F6F8;
+            border: 1px solid #ECEFF1;
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #546E7A;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .action-chip:active {
+            background: #E8F5E9;
+            color: #2E7D32;
+            transform: scale(0.95);
+        }
+
+        /* Modal Selector de Voces Fluidas */
+        .voice-modal-overlay, .parental-modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 37, 30, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 28px;
+            padding: 22px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+            animation: card-appear 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            color: #37474F;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .modal-desc {
+            font-size: 13px;
+            color: #78909C;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .voice-list {
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-right: 4px;
+        }
+
+        .voice-item {
+            padding: 10px 14px;
+            border-radius: 16px;
+            border: 2px solid #ECEFF1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.15s;
+        }
+
+        .voice-item:hover, .voice-item.active {
+            border-color: var(--brand-blue);
+            background: #E1F5FE;
+        }
+
+        .voice-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #263238;
+        }
+
+        .voice-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #FFF9C4;
+            color: #F57F17;
+        }
+
+        .challenge-box {
+            background: #FFF3E0;
+            border: 2px dashed #FFB74D;
+            border-radius: 18px;
+            padding: 14px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #E65100;
+            margin-bottom: 14px;
+        }
+
+        input#parentAnswerInput {
+            width: 120px;
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 16px;
+            border: 2px solid #CFD8DC;
+            margin: 0 auto 18px;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--border-radius-pill);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.15s;
+        }
+
+        .btn-modal:active {
+            transform: scale(0.94);
+        }
+
+        .btn-modal.primary {
+            background: var(--brand-blue);
+            color: white;
+            box-shadow: 0 6px 16px rgba(0, 176, 255, 0.35);
+        }
+
+        .btn-modal.secondary {
+            background: #ECEFF1;
+            color: #607D8B;
+        }
+
+        /* --- Estilos Modo Oscuro / Noche Estelar --- */
+        body.dark-mode {
+            background: linear-gradient(170deg, #070B19 0%, #0D1B2A 40%, #1B263B 100%);
+            color: #E0E1DD;
+        }
+
+        body.dark-mode .app-shell {
+            background: rgba(13, 27, 42, 0.94);
+            border-color: rgba(65, 90, 119, 0.6);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark-mode .status-pill,
+        body.dark-mode .pill-btn,
+        body.dark-mode .speech-card,
+        body.dark-mode .category-chip,
+        body.dark-mode .bottom-dock,
+        body.dark-mode .modal-card {
+            background: #1B263B;
+            color: #E0E1DD;
+            border-color: #415A77;
+        }
+
+        body.dark-mode .speech-text {
+            color: #A7FFEB;
+        }
+
+        body.dark-mode input#queryInput {
+            background: #0D1B2A;
+            color: #E0E1DD;
+            border-color: #415A77;
+        }
+
+        body.dark-mode .action-chip {
+            background: #0D1B2A;
+            color: #90A4AE;
+            border-color: #415A77;
+        }
+
+        body.dark-mode .sound-wave-icon {
+            background: #0D1B2A;
+            color: #00E676;
+        }
+
+        body.dark-mode .podium {
+            background: radial-gradient(ellipse at center, rgba(0, 230, 118, 0.6) 0%, rgba(13, 27, 42, 0.2) 65%, transparent 80%);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="app-shell">
+        <header class="top-navbar">
+            <button class="status-pill toggleable" id="btnToggleOffline" type="button" title="Pulsar para alternar libremente entre WikIAmochi Offline e Híbrido">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="brainStatus">WikIAmochi 100% Offline</span>
+            </button>
+            <div class="nav-actions">
+                <button class="pill-btn" id="btnPinLock" title="Bloquear con PIN de 4 números (Opcional)">
+                    <span id="lockIcon">🔓</span>
+                </button>
+                <button class="pill-btn" id="btnToggleDark" title="Modo Noche Estelar">
+                    <span id="darkIcon">🌙</span>
+                </button>
+                <button class="pill-btn" id="btnOpenVoiceSelect" title="Elegir voz más fluida">
+                    <span>🎙️</span> Voz
+                </button>
+            </div>
+        </header>
+
+        <!-- Barra de Colores del Slime -->
+        <div class="color-palette-bar">
+            <div class="color-dot active" data-color="green" style="background: #00E676;" title="Verde Flubber"></div>
+            <div class="color-dot" data-color="blue" style="background: #00B0FF;" title="Azul Galaxia"></div>
+            <div class="color-dot" data-color="purple" style="background: #D500F9;" title="Púrpura Mágico"></div>
+            <div class="color-dot" data-color="pink" style="background: #FF4081;" title="Rosa Fresa"></div>
+            <div class="color-dot" data-color="orange" style="background: #FF6D00;" title="Naranja Melocotón"></div>
+            <div class="color-dot" data-color="yellow" style="background: #FFD600;" title="Amarillo Sol"></div>
+        </div>
+
+        <!-- Escenario del Tamagotchi -->
+        <section class="tamagotchi-stage" id="tamagotchiStage">
+            <div class="podium"></div>
+            <canvas id="gloopCanvas" width="320" height="320" title="¡Tócame o apriétame!"></canvas>
+        </section>
+
+        <!-- Diálogo del Muñeco -->
+        <section class="speech-card">
+            <div class="speech-header">
+                <div class="header-left">
+                    <span class="badge-source curated" id="sourceBadge">Amigo Curioso</span>
+                </div>
+                <div class="speech-controls">
+                    <!-- Botón de Parar Voz en cualquier momento -->
+                    <button class="btn-stop-speech" id="btnStopSpeech" title="Parar de hablar">
+                        <span>⏹</span> Parar voz
+                    </button>
+                    <div class="sound-wave-icon" id="btnRepeatSpeech" title="Escuchar de nuevo con voz suave">🔊</div>
+                </div>
+            </div>
+
+            <!-- Pregunta del usuario visible para que no se pierda al responder -->
+            <div class="user-question-box" id="userQuestionBox" style="display: none;">
+                <span style="font-size: 11px; font-weight: 700; color: #00838F; display: block; margin-bottom: 2px;">Pregunta del explorador:</span>
+                <span id="userQuestionText" style="font-size: 13px; font-weight: 600; color: #004D40;"></span>
+            </div>
+
+            <p class="speech-text" id="speechText">¡Hola! Soy Gloop, tu amigo de gelatina. ¡Elige mi color arriba, tócame o pregúntame cuántos años tiene la Tierra!</p>
+
+            <!-- Visor de Ilustraciones de la Bóveda ZIM -->
+            <div class="wiki-illustration-box" id="wikiIllustrationBox" style="display: none; margin-top: 10px; border-radius: 18px; overflow: hidden; border: 2px solid #E8F5E9; background: #F1F8E9; box-shadow: 0 6px 16px rgba(0,0,0,0.06); animation: card-appear 0.4s ease;">
+                <img id="wikiIllustrationImg" src="" alt="Ilustración" style="width: 100%; max-height: 180px; object-fit: cover; display: block; background: white;">
+                <div id="wikiIllustrationCaption" style="font-size: 11px; color: #2E7D32; font-weight: 600; padding: 6px 12px; text-align: center; background: #E8F5E9;"></div>
+            </div>
+        </section>
+
+        <!-- Carrusel de Temas Infantiles Rápidos Desplazable -->
+        <div class="quick-categories-container">
+            <button class="scroll-arrow left" id="btnScrollLeft" title="Ver anteriores">‹</button>
+            <section class="quick-categories-wrap" id="quickCategoriesWrap">
+                <button class="category-chip" data-query="cuántos años tiene la tierra">🌍 ¿Cuántos años tiene la Tierra?</button>
+                <button class="category-chip" data-query="por qué el cielo es azul">🌈 ¿Por qué el cielo es azul?</button>
+                <button class="category-chip" data-query="qué es plutón">🌌 ¿Qué es Plutón?</button>
+                <button class="category-chip" data-query="por qué se extinguieron los dinosaurios">🦖 Los Dinosaurios</button>
+                <button class="category-chip" data-query="cuántos planetas hay">🪐 Los Planetas</button>
+                <button class="category-chip" data-query="cómo respiran los peces">🐟 Los Peces</button>
+                <button class="category-chip" data-query="por qué los gatos ronronean">🐱 Gatitos</button>
+                <button class="category-chip" data-query="qué son las estrellas">✨ Las Estrellas</button>
+            </section>
+            <button class="scroll-arrow right" id="btnScrollRight" title="Ver más">›</button>
+        </div>
+
+        <!-- Controles Inferiores y Voz -->
+        <footer class="bottom-dock">
+            <div class="input-bar">
+                <div class="search-field-wrap">
+                    <input type="text" id="queryInput" placeholder="Hazle una pregunta a Gloop..." autocomplete="off">
+                </div>
+                <button class="mic-btn" id="btnMic" title="Hablarle a Gloop">🎤</button>
+                <button class="send-btn" id="btnAsk" title="Preguntar">➜</button>
+            </div>
+
+            <div class="sensor-action-strip">
+                <button class="action-chip" id="btnPoke">👉 Cosquillas</button>
+                <button class="action-chip" id="btnShake">💫 Sacudir</button>
+                <button class="action-chip" id="btnSleep">😴 Dormir</button>
+            </div>
+        </footer>
+
+        <!-- Modal Selector de Voces de WikIAmochi -->
+        <div class="voice-modal-overlay" id="voiceModal">
+            <div class="modal-card">
+                <h3 class="modal-title">🎙️ Elige la Voz de WikIAmochi</h3>
+                <p class="modal-desc">Elige el estilo de muñeco animado que prefieras:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; text-align: left;">
+                    <!-- Opción 1: Flubber Muñeco Gracioso -->
+                    <button class="voice-select-btn active" data-style="cartoon_flubber" style="padding: 12px 14px; border-radius: 16px; border: 2.5px solid var(--brand-blue); background: #E1F5FE; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
+                        <div>
+                            <div style="font-weight: 700; color: #0277BD; font-size: 14px;">🐸 Muñeco Flubber Gracioso (Recomendado)</div>
+                            <div style="font-size: 11px; color: #546E7A;">Tono elástico, alegre y divertido de muñeco de gelatina</div>
+                        </div>
+                        <span style="font-size: 20px;">✨</span>
+                    </button>
+
+                    <!-- Opción 2: Ardillita / Toon Risueño -->
+                    <button class="voice-select-btn" data-style="cartoon_toon" style="padding: 12px 14px; border-radius: 16px; border: 2px solid #ECEFF1; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
+                        <div>
+                            <div style="font-weight: 700; color: #7B1FA2; font-size: 14px;">🐿️ Ardillita / Toon Travieso</div>
+                            <div style="font-size: 11px; color: #546E7A;">Tono agudo, súper alegre y vivaz de dibujo animado</div>
+                        </div>
+                        <span style="font-size: 20px;">⚡</span>
+                    </button>
+
+                    <!-- Opción 3: Chiquillo / Amigo Tierno -->
+                    <button class="voice-select-btn" data-style="kid_soft" style="padding: 12px 14px; border-radius: 16px; border: 2px solid #ECEFF1; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
+                        <div>
+                            <div style="font-weight: 700; color: #2E7D32; font-size: 14px;">🧒 Chiquillo / Amigo Tierno Infantil</div>
+                            <div style="font-size: 11px; color: #546E7A;">Tono dulce, suave y cariñoso de amiguito pequeño</div>
+                        </div>
+                        <span style="font-size: 20px;">💚</span>
+                    </button>
+                </div>
+
+                <!-- Lista de Voces de Respaldo de Windows (100% Offline) -->
+                <div style="text-align: left; margin-bottom: 14px;">
+                    <div style="font-size: 12px; font-weight: 700; color: #37474F; margin-bottom: 4px;">🎙️ Voz de Windows de respaldo (para equipos sin internet):</div>
+                    <div id="systemVoicesContainer" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;"></div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="btn-modal primary" id="btnCloseVoice">Aceptar y Escuchar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Seguridad con PIN de 4 Números (Opcional) -->
+        <div class="parental-modal-overlay" id="pinSecurityModal">
+            <div class="modal-card" style="max-width: 360px;">
+                <div style="font-size: 34px; margin-bottom: 6px;">🔐</div>
+                <h3 class="modal-title" id="pinModalTitle">Seguridad de Conexión</h3>
+                <p class="modal-desc" id="pinModalDesc">Introduce tu PIN de 4 números para pasar al Modo Online:</p>
+                
+                <div id="pinModeDisplay" style="background: #F1F8E9; border-radius: 14px; padding: 10px; margin-bottom: 14px; text-align: center;">
+                    <div style="font-size: 11px; font-weight: 700; color: #546E7A; text-transform: uppercase;">Estado actual</div>
+                    <div id="pinCurrentModeLabel" style="font-size: 14px; font-weight: 700; color: #2E7D32; margin-top: 2px;">🟢 WikIAmochi 100% Offline</div>
+                </div>
+
+                <div id="pinInputSection" style="margin-bottom: 14px;">
+                    <input type="password" id="inputPinCode" maxlength="4" placeholder="••••" inputmode="numeric" style="width: 150px; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: 8px; padding: 8px 12px; border-radius: 16px; border: 2.5px solid #00B0FF; outline: none; background: white; margin: 0 auto; display: block;">
+                    <p id="pinFeedback" style="font-size: 12px; margin-top: 6px; font-weight: 700; min-height: 18px; text-align: center;"></p>
+                </div>
+
+                <div class="modal-buttons" style="flex-direction: column; gap: 8px;">
+                    <button class="btn-modal primary" id="btnToggleModeConfirm">🌐 Desbloquear y Cambiar a Online</button>
+                    <button class="btn-modal secondary" id="btnDisablePin" style="font-size: 12px; padding: 9px; color: #D32F2F;">🔓 Quitar protección por PIN</button>
+                    <button class="btn-modal secondary" id="btnClosePinModal" style="font-size: 12px; padding: 9px;">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { GloopAvatar } from './src/components/GloopAvatar.js';
+        import { GloopPersonality } from './src/brain/aiPersonality.js';
+        import { OnlineLearner } from './src/brain/onlineLearner.js';
+        import { NaturalVoiceService } from './src/services/naturalVoiceService.js';
+        import { ProfileManager } from './src/core/profile/profileManager.js';
+
+        const canvas = document.getElementById('gloopCanvas');
+        const avatar = new GloopAvatar(canvas);
+        avatar.start();
+
+        const personality = new GloopPersonality();
+        const learner = new OnlineLearner(personality);
+        const voiceService = new NaturalVoiceService();
+        const profileManager = new ProfileManager();
+
+        // Cargar estilo de voz guardado de personajes (Flubber, Ardillita, Chiquillo)
+        const savedCartoonStyle = localStorage.getItem('wikia_cartoon_style') || 'cartoon_flubber';
+        voiceService.setCartoonTone(savedCartoonStyle);
+
+        // Control del Modo Offline y Protección por PIN (Opcional, desactivado por defecto)
+        let isOfflineOnly = localStorage.getItem('gloop_offline_only') === 'true';
+        let pinEnabled = localStorage.getItem('gloop_pin_enabled') === 'true';
+        let parentPin = localStorage.getItem('gloop_parent_pin') || '';
+        let activeQueryId = 0; // Token de turno para evitar solapamiento de respuestas y voces
+
+        const btnToggleOffline = document.getElementById('btnToggleOffline');
+        const statusDot = document.getElementById('statusDot');
+        const brainStatus = document.getElementById('brainStatus');
+        const btnPinLock = document.getElementById('btnPinLock');
+        const lockIcon = document.getElementById('lockIcon');
+
+        function updateModeUI() {
+            if (!btnToggleOffline || !statusDot || !brainStatus) return;
+            voiceService.setOfflineMode(isOfflineOnly);
+            if (isOfflineOnly) {
+                btnToggleOffline.classList.remove('online-mode');
+                statusDot.classList.remove('online-mode');
+                brainStatus.textContent = 'WikIAmochi 100% Offline';
+            } else {
+                btnToggleOffline.classList.add('online-mode');
+                statusDot.classList.add('online-mode');
+                brainStatus.textContent = 'Modo Online Híbrido';
+            }
+
+            if (btnPinLock && lockIcon) {
+                if (pinEnabled) {
+                    lockIcon.textContent = '🔒';
+                    btnPinLock.title = 'PIN de seguridad activo (Toca para cambiar o desactivar)';
+                    btnPinLock.style.borderColor = '#00B0FF';
+                } else {
+                    lockIcon.textContent = '🔓';
+                    btnPinLock.title = 'Bloquear con PIN de 4 números (Opcional)';
+                    btnPinLock.style.borderColor = '#CFD8DC';
+                }
+            }
+        }
+        updateModeUI();
+
+        // Control del Modo Noche Estelar (Dark Mode)
+        const btnToggleDark = document.getElementById('btnToggleDark');
+        const darkIcon = document.getElementById('darkIcon');
+
+        function setDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                darkIcon.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark-mode');
+                darkIcon.textContent = '🌙';
+            }
+            profileManager.saveProfile({ darkMode: isDark });
+        }
+
+        if (profileManager.profile.darkMode) {
+            setDarkMode(true);
+        }
+
+        btnToggleDark.addEventListener('click', () => {
+            const isDark = !document.body.classList.contains('dark-mode');
+            setDarkMode(isDark);
+        });
+
+        const speechTextEl = document.getElementById('speechText');
+        const sourceBadge = document.getElementById('sourceBadge');
+        const queryInput = document.getElementById('queryInput');
+        const btnAsk = document.getElementById('btnAsk');
+        const btnMic = document.getElementById('btnMic');
+        const btnRepeat = document.getElementById('btnRepeatSpeech');
+        const btnStopSpeech = document.getElementById('btnStopSpeech');
+        let lastSpokenText = speechTextEl.textContent;
+
+        // Paletas de Color del Slime
+        const SLIME_THEMES = {
+            green: {
+                base: '#00E676',
+                secondary: '#00C853',
+                light: '#A7FFEB',
+                dark: '#004D40',
+                shadow: 'rgba(0, 230, 118, 0.55)'
+            },
+            blue: {
+                base: '#00B0FF',
+                secondary: '#0288D1',
+                light: '#E1F5FE',
+                dark: '#01579B',
+                shadow: 'rgba(0, 176, 255, 0.55)'
+            },
+            purple: {
+                base: '#D500F9',
+                secondary: '#AA00FF',
+                light: '#F3E5F5',
+                dark: '#4A148C',
+                shadow: 'rgba(213, 0, 249, 0.55)'
+            },
+            pink: {
+                base: '#FF4081',
+                secondary: '#C2185B',
+                light: '#FCE4EC',
+                dark: '#880E4F',
+                shadow: 'rgba(255, 64, 129, 0.55)'
+            },
+            orange: {
+                base: '#FF6D00',
+                secondary: '#E65100',
+                light: '#FFF3E0',
+                dark: '#BF360C',
+                shadow: 'rgba(255, 109, 0, 0.55)'
+            },
+            yellow: {
+                base: '#FFD600',
+                secondary: '#FFAB00',
+                light: '#FFFDE7',
+                dark: '#F57F17',
+                shadow: 'rgba(255, 214, 0, 0.55)'
+            }
+        };
+
+        // Eventos de selección de color
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                const colorKey = dot.getAttribute('data-color');
+                const theme = SLIME_THEMES[colorKey];
+                if (theme) {
+                    avatar.setColorTheme(theme);
+                    playCuteChime();
+                }
+            });
+        });
+
+        // Efecto de sonido tierno ("bloop")
+        function playCuteChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.12); // G5
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.22);
+            } catch (e) {}
+        }
+
+        // Gestión de Voces y Preferencias
+        let selectedVoice = null;
+        let availableVoices = [];
+
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('es'));
+
+            const savedVoiceName = localStorage.getItem('wikia_selected_voice_name');
+            if (savedVoiceName && availableVoices.length > 0) {
+                const found = availableVoices.find(v => v.name === savedVoiceName);
+                if (found) {
+                    selectedVoice = found;
+                    voiceService.setVoice('system', found);
+                } else {
+                    selectedVoice = null;
+                }
+            } else {
+                selectedVoice = null;
+            }
+            renderVoiceList();
+        }
+
+        function renderVoiceList() {
+            const container = document.getElementById('systemVoicesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (availableVoices.length === 0) {
+                container.innerHTML = '<p style="font-size: 11px; color: #78909C; padding: 6px;">No se encontraron voces locales en español.</p>';
+                return;
+            }
+
+            availableVoices.forEach(voice => {
+                const isCurrent = selectedVoice && selectedVoice.name === voice.name;
+                const item = document.createElement('div');
+                item.className = 'voice-item';
+                item.style.padding = '8px 12px';
+                item.style.borderRadius = '12px';
+                item.style.border = isCurrent ? '2px solid var(--brand-blue)' : '1.5px solid #ECEFF1';
+                item.style.cursor = 'pointer';
+                item.style.fontSize = '12px';
+                item.style.background = isCurrent ? '#E1F5FE' : 'white';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+
+                const isDesktop = voice.name.includes('Desktop') || voice.name.includes('Helena') || voice.name.includes('Sabina');
+                const tag = isDesktop ? 'Offline Estándar' : 'Offline Natural';
+
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: 700; color: #37474F;">${voice.name}</div>
+                        <div style="font-size: 10px; color: #90A4AE;">${voice.lang} • ${tag}</div>
+                    </div>
+                    ${isCurrent ? '<span style="font-size: 14px;">✓</span>' : ''}
+                `;
+
+                item.addEventListener('click', () => {
+                    selectedVoice = voice;
+                    localStorage.setItem('wikia_selected_voice_name', voice.name);
+
+                    document.querySelectorAll('#systemVoicesContainer .voice-item').forEach(v => {
+                        v.style.borderColor = '#ECEFF1';
+                        v.style.background = 'white';
+                    });
+                    item.style.borderColor = 'var(--brand-blue)';
+                    item.style.background = '#E1F5FE';
+
+                    voiceService.setVoice('system', voice);
+                    speak('¡Hola! Soy WikIAmochi. Ahora hablo con la voz de ' + voice.name.split(' ')[0] + ' de forma suave y sin internet.', 'curated');
+                    renderVoiceList();
+                });
+
+                container.appendChild(item);
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // Función para Detener la Voz de Inmediato
+        function stopSpeaking() {
+            voiceService.stop();
+            avatar.isTalking = false;
+            btnStopSpeech.classList.remove('active');
+        }
+
+        btnStopSpeech.addEventListener('click', stopSpeaking);
+
+        // Síntesis de Voz Humana Ultrafluida
+        function speak(text, source = 'curated', keepDizzy = false) {
+            stopSpeaking(); // Detener locución previa
+
+            lastSpokenText = text;
+            speechTextEl.textContent = text;
+            if (!keepDizzy) {
+                avatar.physics.isDizzy = false;
+            }
+
+            if (source === 'curated') {
+                sourceBadge.textContent = '🌟 Sabiduría Infantil';
+                sourceBadge.className = 'badge-source curated';
+            } else if (source === 'online') {
+                sourceBadge.textContent = '🌐 Internet Seguro';
+                sourceBadge.className = 'badge-source online';
+            } else {
+                sourceBadge.textContent = '📖 Memoria WikIAmochi';
+                sourceBadge.className = 'badge-source';
+            }
+
+            playCuteChime();
+
+            voiceService.speak(
+                text,
+                () => {
+                    avatar.isTalking = true;
+                    btnStopSpeech.classList.add('active');
+                },
+                () => {
+                    avatar.isTalking = false;
+                    btnStopSpeech.classList.remove('active');
+                }
+            );
+        }
+
+        btnRepeat.addEventListener('click', () => {
+            speak(lastSpokenText);
+        });
+
+        async function showIllustration(imgSource, caption) {
+            const box = document.getElementById('wikiIllustrationBox');
+            const img = document.getElementById('wikiIllustrationImg');
+            const cap = document.getElementById('wikiIllustrationCaption');
+            if (!imgSource) {
+                box.style.display = 'none';
+                return;
+            }
+
+            let finalSrc = imgSource;
+            // Si es una ruta que necesita extraerse del ZIM (ej: _assets_/...)
+            if (typeof imgSource === 'string' && (imgSource.startsWith('_assets_') || imgSource.includes('/api/image?path='))) {
+                let cleanPath = imgSource.replace('/api/image?path=', '').replace(/^\//, '');
+                cleanPath = decodeURIComponent(cleanPath);
+                if (window.gloopAPI && window.gloopAPI.getImageData) {
+                    try {
+                        const b64 = await window.gloopAPI.getImageData(cleanPath);
+                        if (b64) finalSrc = b64;
+                    } catch (err) {
+                        console.warn('Error extrayendo imagen:', err);
+                    }
+                }
+            }
+
+            img.src = finalSrc;
+            cap.textContent = caption || 'Ilustración oficial de la Enciclopedia WikIAmochi';
+            box.style.display = 'block';
+        }
+
+        // Búsqueda Inteligente Híbrida (Local + Online con Filtro Infantil y Memoria Permanente)
+        async function askGloop(rawQuery) {
+            if (!rawQuery || !rawQuery.trim()) return;
+            const query = rawQuery.trim();
+
+            // Identificador único de turno: cualquier pregunta nueva invalida de inmediato la anterior
+            const currentQueryId = ++activeQueryId;
+            stopSpeaking();
+
+            // Mostrar la pregunta del niño de forma visible para que no se pierda mientras responde
+            const userQuestionBox = document.getElementById('userQuestionBox');
+            const userQuestionText = document.getElementById('userQuestionText');
+            if (userQuestionBox && userQuestionText) {
+                userQuestionText.textContent = `« ${query} »`;
+                userQuestionBox.style.display = 'block';
+            }
+
+            // 1. Cortafuegos infantil estricto en la pregunta
+            if (!personality.isContentSafe(query)) {
+                await showIllustration(null);
+                if (currentQueryId !== activeQueryId) return;
+                const fallback = personality.getSafeFallbackResponse();
+                speak(fallback.speechText, 'curated');
+                return;
+            }
+
+            speechTextEl.textContent = `¡Gloop! Pensando con mucho cariño en tu pregunta...`;
+            avatar.physics.poke(0, 0.25);
+
+            // 2. Revisar si es una duda infantil curada
+            const directResponse = personality.craftResponse(query, query, "");
+            if (directResponse && directResponse.source === 'curated') {
+                if (currentQueryId !== activeQueryId) return;
+                speak(directResponse.speechText, 'curated');
+                showIllustration(directResponse.imagePath || directResponse.imageUrl, directResponse.imageCaption);
+                return;
+            }
+
+            // 3. Normalizar términos y extraer el concepto clave
+            let cleanKey = query.toLowerCase().replace(/[?¿!¡,.]/g, ' ').replace(/\s+/g, ' ').trim();
+            // Quitar fórmulas interrogativas típicas ("que es", "por que", "quien fue", etc.)
+            cleanKey = cleanKey
+                .replace(/^(?:que|qué|quien|quién|como|cómo|donde|dónde|por\s+que|por\s+qué|cuanto|cuánto|cuantos|cuántos)\s+(?:es|era|son|eran|fue|fueron|significa|quiere\s+decir)\s+/i, '')
+                .replace(/^(?:un|una|el|la|los|las|de|del)\s+/i, '')
+                .trim();
+
+            const stopWords = ['cuantos', 'cuanto', 'cuanta', 'cuantas', 'anos', 'años', 'tiene', 'la', 'el', 'los', 'las', 'de', 'del', 'un', 'una', 'en', 'que', 'es', 'por', 'como', 'donde'];
+            const searchWords = cleanKey.split(/\s+/).filter(w => !stopWords.includes(w));
+            const searchQuery = searchWords.length > 0 ? searchWords.join(' ') : cleanKey || query;
+
+            try {
+                // 4. Revisar si ya lo había aprendido y memorizado en disco previamente
+                const memorized = learner.getCached(searchQuery) || learner.getCached(cleanKey);
+                if (memorized) {
+                    const response = personality.craftResponse(query, memorized.title, memorized.snippet, memorized.imageUrl);
+                    if (currentQueryId !== activeQueryId) return;
+                    speak(response.speechText, 'vikidia');
+                    showIllustration(memorized.imageUrl, `Ilustración memorizada: ${memorized.title}`);
+                    return;
+                }
+
+                // 5. Buscar en la enciclopedia local Vikidia (ZIM offline)
+                let foundLocal = false;
+                if (window.gloopAPI && window.gloopAPI.searchVikidia) {
+                    try {
+                        const data = await window.gloopAPI.searchVikidia(searchQuery);
+                        if (currentQueryId !== activeQueryId) return;
+
+                        if (data && data.found && data.results && data.results.length > 0) {
+                            const first = data.results[0];
+                            const response = personality.craftResponse(query, first.title, first.snippet, first.imagePath);
+                            if (currentQueryId !== activeQueryId) return;
+                            // Iniciar la voz al instante mientras la ilustración se carga en paralelo
+                            speak(response.speechText, 'vikidia');
+                            showIllustration(first.imagePath, `Ilustración: ${first.title}`);
+                            foundLocal = true;
+                        }
+                    } catch (e) {
+                        console.warn('Consulta ZIM local error:', e);
+                    }
+                }
+
+                if (currentQueryId !== activeQueryId) return;
+                if (foundLocal) return;
+
+                // 6. Si el modo 100% Offline está activo: NO tocar internet
+                if (isOfflineOnly) {
+                    if (currentQueryId !== activeQueryId) return;
+                    speak(`¡Gloop! En la enciclopedia WikIAmochi offline no encuentro ese tema. ¿Quieres que busquemos sobre los dinosaurios, planetas o animales?`, 'curated');
+                    showIllustration(null);
+                    return;
+                }
+
+                // 7. Si el Modo Online Híbrido está activado: consultar con filtro infantil y memorizar
+                speechTextEl.textContent = `¡Gloop! Investigando en mi biblioteca mágica para aprenderlo...`;
+                let learned = await learner.learnConcept(searchQuery);
+                if (currentQueryId !== activeQueryId) return;
+
+                if (!learned && searchQuery !== cleanKey && cleanKey) {
+                    learned = await learner.learnConcept(cleanKey);
+                    if (currentQueryId !== activeQueryId) return;
+                }
+
+                if (learned) {
+                    const response = personality.craftResponse(query, learned.title, learned.snippet, learned.imageUrl);
+                    if (currentQueryId !== activeQueryId) return;
+                    speak(response.speechText, 'vikidia');
+                    showIllustration(learned.imageUrl, `Ilustración: ${learned.title}`);
+                    return;
+                }
+
+                // 8. Fallback cariñoso si no se encuentra ni local ni online
+                await showIllustration(null);
+                if (currentQueryId !== activeQueryId) return;
+                speak(`¡Gloop! Es un misterio tan grande que aún no lo sé. ¿Quieres que investiguemos sobre dinosaurios o los planetas?`, 'curated');
+            } catch (err) {
+                if (currentQueryId !== activeQueryId) return;
+                await showIllustration(null);
+                speak(`¡Gloop! Mis orejitas de gelatina no escucharon bien. ¡Pregúntame de nuevo, por favor!`, 'curated');
+            }
+        }
+
+        btnAsk.addEventListener('click', () => {
+            askGloop(queryInput.value);
+            queryInput.value = '';
+        });
+
+        queryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                askGloop(queryInput.value);
+                queryInput.value = '';
+            }
+        });
+
+        // Gestión de Desplazamiento Fluido de las Preguntas Sugeridas
+        const catWrap = document.getElementById('quickCategoriesWrap');
+        const btnScrollLeft = document.getElementById('btnScrollLeft');
+        const btnScrollRight = document.getElementById('btnScrollRight');
+        let isDraggingCats = false;
+        let dragStartX = 0;
+        let dragScrollLeft = 0;
+        let hasMovedDrag = false;
+
+        if (catWrap) {
+            // 1. Flechas de navegación con clic
+            btnScrollLeft?.addEventListener('click', () => {
+                catWrap.scrollBy({ left: -180, behavior: 'smooth' });
+            });
+            btnScrollRight?.addEventListener('click', () => {
+                catWrap.scrollBy({ left: 180, behavior: 'smooth' });
+            });
+
+            // 2. Desplazamiento horizontal con la rueda del ratón
+            catWrap.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                catWrap.scrollLeft += e.deltaY * 1.25;
+            }, { passive: false });
+
+            // 3. Arrastre directo con el ratón (Click and Drag to scroll)
+            catWrap.addEventListener('mousedown', (e) => {
+                isDraggingCats = true;
+                hasMovedDrag = false;
+                catWrap.classList.add('grabbing');
+                dragStartX = e.pageX - catWrap.offsetLeft;
+                dragScrollLeft = catWrap.scrollLeft;
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isDraggingCats) {
+                    isDraggingCats = false;
+                    catWrap.classList.remove('grabbing');
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDraggingCats) return;
+                const x = e.pageX - catWrap.offsetLeft;
+                const walk = (x - dragStartX) * 1.4;
+                if (Math.abs(walk) > 4) {
+                    hasMovedDrag = true;
+                }
+                catWrap.scrollLeft = dragScrollLeft - walk;
+            });
+        }
+
+        document.querySelectorAll('.category-chip').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Si el usuario estaba arrastrando el carrusel, no activar la pregunta por accidente
+                if (hasMovedDrag) {
+                    hasMovedDrag = false;
+                    return;
+                }
+                const query = btn.getAttribute('data-query');
+                askGloop(query);
+            });
+        });
+
+        // Micrófono
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognizer = new SpeechRec();
+            recognizer.lang = 'es-ES';
+
+            btnMic.addEventListener('click', () => {
+                btnMic.classList.add('listening');
+                speechTextEl.textContent = '¡Te escucho con atención! Háblale a Gloop...';
+                recognizer.start();
+            });
+
+            recognizer.onresult = (event) => {
+                btnMic.classList.remove('listening');
+                const text = event.results[0][0].transcript;
+                queryInput.value = text;
+                askGloop(text);
+            };
+
+            recognizer.onerror = () => { btnMic.classList.remove('listening'); };
+            recognizer.onend = () => { btnMic.classList.remove('listening'); };
+        } else {
+            btnMic.style.display = 'none';
+        }
+
+        // Acciones y toques
+        document.getElementById('btnPoke').addEventListener('click', () => {
+            avatar.physics.poke(0, 0.42);
+            speak('¡Jejeje, qué cosquillitas más ricas!', 'curated');
+        });
+
+        document.getElementById('btnShake').addEventListener('click', () => {
+            avatar.shake();
+            speak('¡Waaah! ¡Qué mareo! ¡Todo me da vueltas como en una montaña rusa!', 'curated', true);
+        });
+
+        document.getElementById('btnSleep').addEventListener('click', () => {
+            avatar.physics.isSleeping = !avatar.physics.isSleeping;
+            if (avatar.physics.isSleeping) {
+                speechTextEl.textContent = 'Zzz... Gloop está soñando con planetas de gelatina...';
+            } else {
+                speak('¡Buenos días, amiguito! ¿Qué gran aventura descubriremos hoy?', 'curated');
+            }
+        });
+
+        // Modal de Configuración de Voces
+        const voiceModal = document.getElementById('voiceModal');
+        const btnOpenVoiceSelect = document.getElementById('btnOpenVoiceSelect');
+        const btnCloseVoice = document.getElementById('btnCloseVoice');
+
+        function updateVoiceButtonStates() {
+            const currentStyle = localStorage.getItem('wikia_cartoon_style') || 'cartoon_flubber';
+            const hasSystemVoice = !!localStorage.getItem('wikia_selected_voice_name');
+            document.querySelectorAll('.voice-select-btn').forEach(btn => {
+                const s = btn.getAttribute('data-style');
+                if (!hasSystemVoice && (s === currentStyle || (currentStyle === 'flubber' && s === 'cartoon_flubber'))) {
+                    btn.classList.add('active');
+                    btn.style.borderColor = 'var(--brand-blue)';
+                    btn.style.background = '#E1F5FE';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.borderColor = '#ECEFF1';
+                    btn.style.background = 'white';
+                }
+            });
+        }
+
+        document.querySelectorAll('.voice-select-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const style = btn.getAttribute('data-style');
+                localStorage.removeItem('wikia_selected_voice_name');
+                selectedVoice = null;
+                localStorage.setItem('wikia_cartoon_style', style);
+                voiceService.setCartoonTone(style);
+                updateVoiceButtonStates();
+                renderVoiceList();
+
+                if (style === 'cartoon_flubber') {
+                    speak('¡Hola, amiguito! Soy WikIAmochi. ¡Sueno como un muñequito de gelatina divertido!', 'curated');
+                } else if (style === 'cartoon_toon') {
+                    speak('¡Yuju! ¡Mira qué voz de ardillita tan rápida y risueña tengo ahora! ¡Parece de dibujo animado!', 'curated');
+                } else {
+                    speak('¡Hola! Esta es mi voz suave y cariñosa de chiquillo, ¿a que mola?', 'curated');
+                }
+            });
+        });
+
+        btnOpenVoiceSelect.addEventListener('click', () => {
+            updateVoiceButtonStates();
+            renderVoiceList();
+            voiceModal.style.display = 'flex';
+        });
+
+        btnCloseVoice.addEventListener('click', () => {
+            voiceModal.style.display = 'none';
+        });
+
+        // Control del Modo Offline Directo y Protección por PIN (Totalmente Opcional)
+        const pinSecurityModal = document.getElementById('pinSecurityModal');
+        const btnToggleModeConfirm = document.getElementById('btnToggleModeConfirm');
+        const btnDisablePin = document.getElementById('btnDisablePin');
+        const btnClosePinModal = document.getElementById('btnClosePinModal');
+        const inputPinCode = document.getElementById('inputPinCode');
+        const pinFeedback = document.getElementById('pinFeedback');
+        const pinCurrentModeLabel = document.getElementById('pinCurrentModeLabel');
+
+        function toggleOfflineModeDirect() {
+            isOfflineOnly = !isOfflineOnly;
+            localStorage.setItem('gloop_offline_only', isOfflineOnly ? 'true' : 'false');
+            updateModeUI();
+            playCuteChime();
+            if (isOfflineOnly) {
+                speak('¡Modo WikIAmochi 100% Offline activado! Ahora solo responderé con la enciclopedia guardada.', 'curated');
+            } else {
+                speak('¡Modo Online Híbrido activado con supervisión! Podré aprender cositas seguras de internet.', 'curated');
+            }
+        }
+
+        function openPinModal() {
+            inputPinCode.value = '';
+            pinFeedback.textContent = '';
+            if (isOfflineOnly) {
+                pinCurrentModeLabel.textContent = '🟢 WikIAmochi 100% Offline';
+                pinCurrentModeLabel.style.color = '#2E7D32';
+                btnToggleModeConfirm.textContent = '🌐 Desbloquear y Cambiar a Online';
+            } else {
+                pinCurrentModeLabel.textContent = '🌐 Modo Online Híbrido';
+                pinCurrentModeLabel.style.color = '#0277BD';
+                btnToggleModeConfirm.textContent = '🟢 Cambiar a Modo 100% Offline';
+            }
+            pinSecurityModal.style.display = 'flex';
+            setTimeout(() => inputPinCode.focus(), 150);
+        }
+
+        function closePinModal() {
+            pinSecurityModal.style.display = 'none';
+        }
+
+        // 1. Pulsador superior: conmuta directamente al instante si no hay PIN configurado
+        btnToggleOffline.addEventListener('click', () => {
+            if (!pinEnabled) {
+                // Sin PIN: conmutación libre inmediata
+                toggleOfflineModeDirect();
+            } else {
+                // Con PIN activo: solo se exige el PIN para pasar a Online
+                if (isOfflineOnly) {
+                    openPinModal();
+                } else {
+                    toggleOfflineModeDirect();
+                }
+            }
+        });
+
+        btnClosePinModal.addEventListener('click', closePinModal);
+
+        btnToggleModeConfirm.addEventListener('click', () => {
+            const entered = inputPinCode.value.trim();
+            if (entered === parentPin) {
+                closePinModal();
+                toggleOfflineModeDirect();
+            } else {
+                pinFeedback.style.color = '#D32F2F';
+                pinFeedback.textContent = '✗ PIN incorrecto.';
+                inputPinCode.value = '';
+                inputPinCode.focus();
+            }
+        });
+
+        inputPinCode.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                btnToggleModeConfirm.click();
+            }
+        });
+
+        // 2. Desactivar PIN desde el propio modal
+        if (btnDisablePin) {
+            btnDisablePin.addEventListener('click', () => {
+                const entered = inputPinCode.value.trim();
+                if (entered !== parentPin) {
+                    pinFeedback.style.color = '#D32F2F';
+                    pinFeedback.textContent = '✗ Introduce tu PIN actual arriba para poder desactivarlo.';
+                    inputPinCode.focus();
+                    return;
+                }
+                pinEnabled = false;
+                parentPin = '';
+                localStorage.removeItem('gloop_parent_pin');
+                localStorage.setItem('gloop_pin_enabled', 'false');
+                updateModeUI();
+                closePinModal();
+                alert('✓ PIN desactivado. El botón de arriba ahora cambia de modo directamente sin pedir nada.');
+            });
+        }
+
+        // 3. Botón de Candado en la barra superior para activar o gestionar el PIN opcional
+        if (btnPinLock) {
+            btnPinLock.addEventListener('click', () => {
+                if (!pinEnabled) {
+                    const wantPin = confirm('¿Deseas activar un PIN de 4 números para proteger el cambio a Modo Online? (Es totalmente opcional)');
+                    if (!wantPin) return;
+                    const newPin = prompt('Introduce tu nuevo PIN de 4 números (ej: 1234):');
+                    if (!newPin) return;
+                    if (!/^\d{4}$/.test(newPin.trim())) {
+                        alert('El PIN debe tener exactamente 4 dígitos numéricos.');
+                        return;
+                    }
+                    parentPin = newPin.trim();
+                    pinEnabled = true;
+                    localStorage.setItem('gloop_parent_pin', parentPin);
+                    localStorage.setItem('gloop_pin_enabled', 'true');
+                    updateModeUI();
+                    alert('✓ ¡PIN de seguridad activado! Ahora estará protegido con candado 🔒.');
+                } else {
+                    const entered = prompt('Introduce tu PIN actual para gestionar la seguridad:');
+                    if (entered === null) return;
+                    if (entered.trim() !== parentPin) {
+                        alert('El PIN no es correcto.');
+                        return;
+                    }
+                    const action = confirm('Pulsa ACEPTAR para DESACTIVAR el PIN (dejarlo libre) o CANCELAR para cambiar el PIN.');
+                    if (action) {
+                        pinEnabled = false;
+                        parentPin = '';
+                        localStorage.removeItem('gloop_parent_pin');
+                        localStorage.setItem('gloop_pin_enabled', 'false');
+                        updateModeUI();
+                        alert('✓ PIN desactivado con éxito. El modo ahora es libre.');
+                    } else {
+                        const newPin = prompt('Introduce el nuevo PIN de 4 números:');
+                        if (!newPin || !/^\d{4}$/.test(newPin.trim())) {
+                            alert('El PIN debe tener exactamente 4 dígitos numéricos.');
+                            return;
+                        }
+                        parentPin = newPin.trim();
+                        localStorage.setItem('gloop_parent_pin', parentPin);
+                        alert('✓ ¡PIN actualizado correctamente!');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

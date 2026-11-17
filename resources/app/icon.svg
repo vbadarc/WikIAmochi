@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Sombra de contacto inferior -->
+    <radialGradient id="dropShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#004D40" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#004D40" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#004D40" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Iluminación esférica 2.5D del cuerpo de gelatina -->
+    <radialGradient id="jellyGrad" cx="35%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#A7FFEB"/>
+      <stop offset="22%" stop-color="#00E676"/>
+      <stop offset="65%" stop-color="#00C853"/>
+      <stop offset="88%" stop-color="#00796B"/>
+      <stop offset="100%" stop-color="#004D40"/>
+    </radialGradient>
+
+    <!-- Brillo especular superior curvo -->
+    <linearGradient id="specularGleam" x1="0%" y1="0%" x2="70%" y2="80%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Ojos Anime/Kawaii -->
+    <radialGradient id="eyeIris" cx="50%" cy="65%" r="50%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="70%" stop-color="#00796B"/>
+      <stop offset="100%" stop-color="#1A2421"/>
+    </radialGradient>
+
+    <!-- Rubor en mejillas -->
+    <radialGradient id="blushGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF4081" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FF4081" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 1. Sombra en el suelo -->
+  <ellipse cx="256" cy="460" rx="190" ry="32" fill="url(#dropShadow)" />
+
+  <!-- 2. Cuerpo gelatinoso orgánico (Forma Flubber) -->
+  <path d="M 256,70 
+           C 410,85 470,270 455,370 
+           C 440,445 360,455 256,455 
+           C 152,455 72,445 57,370 
+           C 42,270 102,85 256,70 Z" 
+        fill="url(#jellyGrad)" 
+        stroke="#A7FFEB" 
+        stroke-width="6" 
+        stroke-linejoin="round" />
+
+  <!-- 3. Brillo de luz reflejada cáustica (Cresta superior) -->
+  <path d="M 160,110 
+           C 230,85 300,90 350,120 
+           C 310,140 220,135 160,110 Z" 
+        fill="url(#specularGleam)" />
+
+  <ellipse cx="180" cy="140" rx="42" ry="22" transform="rotate(-28, 180, 140)" fill="url(#specularGleam)" />
+
+  <!-- 4. Burbujas internas flotantes -->
+  <circle cx="340" cy="220" r="14" fill="#FFFFFF" fill-opacity="0.3" />
+  <circle cx="337" cy="217" r="4" fill="#FFFFFF" fill-opacity="0.8" />
+  
+  <circle cx="160" cy="340" r="18" fill="#FFFFFF" fill-opacity="0.25" />
+  <circle cx="156" cy="336" r="5" fill="#FFFFFF" fill-opacity="0.75" />
+
+  <circle cx="365" cy="350" r="11" fill="#FFFFFF" fill-opacity="0.25" />
+
+  <!-- 5. Rubor tierno en las mejillas -->
+  <ellipse cx="145" cy="315" rx="28" ry="16" fill="url(#blushGrad)" />
+  <ellipse cx="367" cy="315" rx="28" ry="16" fill="url(#blushGrad)" />
+
+  <!-- 6. Ojo Izquierdo Kawaii -->
+  <g transform="translate(185, 255)">
+    <!-- Base esclerótica oscura/pupila -->
+    <ellipse cx="0" cy="0" rx="36" ry="46" fill="#15201B" />
+    <!-- Iris interior verde brillante -->
+    <ellipse cx="0" cy="14" rx="26" ry="24" fill="url(#eyeIris)" />
+    <!-- Reflejo principal grande de luz -->
+    <circle cx="-12" cy="-15" r="14" fill="#FFFFFF" />
+    <!-- Reflejo secundario tierno -->
+    <circle cx="12" cy="12" r="7" fill="#FFFFFF" />
+  </g>
+
+  <!-- 7. Ojo Derecho Kawaii -->
+  <g transform="translate(327, 255)">
+    <!-- Base esclerótica oscura/pupila -->
+    <ellipse cx="0" cy="0" rx="36" ry="46" fill="#15201B" />
+    <!-- Iris interior verde brillante -->
+    <ellipse cx="0" cy="14" rx="26" ry="24" fill="url(#eyeIris)" />
+    <!-- Reflejo principal grande de luz -->
+    <circle cx="-12" cy="-15" r="14" fill="#FFFFFF" />
+    <!-- Reflejo secundario tierno -->
+    <circle cx="12" cy="12" r="7" fill="#FFFFFF" />
+  </g>
+
+  <!-- 8. Sonrisa tierna de gelatina -->
+  <path d="M 234,318 
+           Q 256,344 278,318" 
+        fill="none" 
+        stroke="#004D40" 
+        stroke-width="6.5" 
+        stroke-linecap="round" />
+</svg>
+

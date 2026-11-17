@@ -1,0 +1,20 @@
+{
+  "name": "wikiamochi",
+  "productName": "WikIAmochi",
+  "version": "1.0.0",
+  "description": "WikIAmochi - Enciclopedia Tamagotchi Autónoma Infantil para Windows y Android",
+  "main": "resources/app/main.js",
+  "scripts": {
+    "start": "electron resources/app",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:add": "npx cap add android"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/android": "^6.2.0"
+  }
+}
+
