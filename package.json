@@ -17,6 +17,8 @@
     "@capacitor/core": "8.6.2"
   },
   "dependencies": {
-    "@capacitor-community/text-to-speech": "^8.0.2"
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/preferences": "^8.0.1"
   }
 }
