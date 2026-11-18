@@ -80,16 +80,23 @@ Para cumplir la Regla 1 (no romper Electron y aislar llamadas nativas):
    * En **Electron/Web:** usa `webkitSpeechRecognition` si existe.
    * En **Android:** `SpeechRecognition` web no está implementado de forma fiable en Android WebView. Se sustituye por `@capacitor-community/speech-recognition` en `es-ES`, solicitando el permiso `RECORD_AUDIO` **únicamente cuando el usuario pulsa el botón del micrófono**, mostrando antes una tarjeta explicativa amigable.
 3. **Voz de Salida (`NaturalVoiceService`) y Diferencias entre Escritorio y Android:**
-   * **Diferencia documentada:** En la versión de escritorio Windows, cuando hay conexión se utiliza `msedge-tts` y en modo offline `piper.exe`. En Android no pueden incluirse `piper.exe` ni redistribuirse los MP3 de `msedge-tts`.
-   * **Cómo acercar al máximo las 3 voces en Android (`Flubber`, `Ardillita` y `Chiquillo`) sin asumir un motor preinstalado único:**
-     1. Utilizaremos `@capacitor-community/text-to-speech` consultando dinámicamente el motor TTS activo del dispositivo (`getSupportedVoices()` / `getSupportedLanguages()`) sin asumir que `com.google.android.tts` esté presente en todos los fabricantes.
-     2. Si existen voces en español (`es-ES`, `es-MX`, `es-US` o `es`), seleccionaremos variantes distintas cuando el motor las ofrezca y aplicaremos modulación nativa de `pitch` y `rate` en `android.speech.tts.TextToSpeech`:
-        * **🐸 Muñeco Flubber Gracioso:** `pitch: 1.12`, `rate: 1.06`.
-        * **🐿️ Ardillita / Toon Travieso:** `pitch: 1.48`, `rate: 1.24`.
-        * **🧒 Chiquillo / Amigo Tierno:** `pitch: 1.26`, `rate: 0.96`.
-     3. **Caso sin voz en español instalada:** Si el dispositivo no dispone de ninguna voz en español instalada en su motor TTS, la aplicación **mostrará siempre la respuesta escrita completa en el bocadillo de texto**, mantendrá la animación del personaje y mostrará un aviso claro orientado al adulto indicando cómo activar o descargar el paquete de voz en español en los Ajustes de Accesibilidad/Texto a voz de Android.
-4. **Persistencia (`Preferences` / `Filesystem`):**
-   * Migrar la configuración crítica (PIN parental, modo offline, estilo de voz y conceptos aprendidos) a `@capacitor/preferences` con respaldo en `localStorage`, evitando pérdidas si Android limpia la caché del WebView.
+   * **Diferencia documentada:** En la versión de escritorio Windows se utiliza `msedge-tts` (online) y `piper.exe` (offline). En Android no se redistribuyen binarios de Piper ni la caché de MP3 de `msedge-tts`, por lo que la síntesis de voz en Android depende 100% del motor nativo Text-to-Speech del sistema (`android.speech.tts.TextToSpeech`) mediante `@capacitor-community/text-to-speech`.
+   * **Comprobación en dispositivo real (Xiaomi Redmi Note 8 Pro, Android 11, motor Google TTS):**
+     * `getSupportedVoices()` reporta 473 voces totales y 18 variantes con etiqueta de idioma `es-*` (`es-ES`, `es-US`), de las cuales 10 son locales (`localService: true`, sin requerir conexión de red: `es-es-x-eea-local`, `es-es-x-eec-local`, `es-es-x-eed-local`, `es-es-x-eee-local`, `es-es-x-eef-local`, etc.).
+     * La API de Android `Voice` solo proporciona de forma verificable `name`, `locale`, `isNetworkConnectionRequired` y `latency`; no proporciona metadatos oficiales de género ni de edad. Por tanto, no se presuponen características no auditables.
+     * **Criterio objetivo de asignación:** Las voces locales `es-*` se ordenan de forma determinista por su `voiceURI` y se asignan por índice numérico a cada personaje:
+       - Estilo 1 (`cartoon_flubber`): Índice local 0 (`voiceURI="es-es-x-eea-local"`), `pitch: 1.05`, `rate: 1.02`.
+       - Estilo 2 (`cartoon_toon`): Índice local 1 (`voiceURI="es-es-x-eec-local"`), `pitch: 1.25`, `rate: 1.15`.
+       - Estilo 3 (`kid_soft`): Índice local 2 (`voiceURI="es-es-x-eed-local"`), `pitch: 1.10`, `rate: 0.96`.
+     * **Calibrador interactivo en builds debug:** Se incorpora en la interfaz (solo en debug) un panel para escuchar cada variante disponible con sliders de pitch y rate, emitiendo en logcat `[AndroidTTS_APPLIED]` y `[AndroidTTS_TEST]` con los valores numéricos exactos para permitir la elección final de configuración.
+     * **Caso sin voces locales en español:** Si el dispositivo carece de voces en español, la app presenta la respuesta escrita en pantalla e indica la necesidad de instalar el paquete de idioma español en Ajustes > Accesibilidad > Texto a voz de Android.
+4. **Voz de Entrada (Micrófono) y Privacidad (Decisión Confirmada):**
+   * **Desactivado por defecto:** En cumplimiento de las Políticas de Familias de Google Play y COPPA/RGPD-K, el micrófono viene **apagado por defecto**.
+   * **Activación exclusiva por adulto:** Solo un adulto puede activarlo desde el panel de Ajustes tras superar la puerta parental.
+   * **Permiso sensible:** El permiso `android.permission.RECORD_AUDIO` es el único permiso sensible añadido al `AndroidManifest.xml` y nunca se solicita al sistema operativo mientras el ajuste permanezca desactivado.
+   * **Privacidad del audio:** Según la documentación oficial de Android SpeechRecognizer, en versiones de Android que cuenten con el modelo local de reconocimiento en el dispositivo (`SpeechRecognizer.isOnDeviceRecognitionAvailable()`), el audio no sale del terminal. En terminales donde el servicio de Google requiera red, el audio se procesa en los servidores de reconocimiento de voz de Google. Esta circunstancia queda claramente advertida al adulto antes de activar la función.
+5. **Persistencia (`Preferences` / `Filesystem`):**
+   * Migrar la configuración crítica (PIN parental, modo offline, estado del micrófono, estilo de voz y conceptos aprendidos) a `@capacitor/preferences` con respaldo en `localStorage`, evitando pérdidas si Android limpia la caché del WebView.
 
 ---
 

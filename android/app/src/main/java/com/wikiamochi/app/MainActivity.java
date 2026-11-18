@@ -1,5 +1,6 @@
 package com.wikiamochi.app;
 
+import android.content.pm.ApplicationInfo;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -122,7 +123,8 @@ public class MainActivity extends BridgeActivity {
                             // 4. offset + length no puede ser negativo ni superar los límites del ZIM.
                             final int MAX_SLICE_BYTES = 1024 * 1024; // 1 MB
                             if (offset < 0 || length <= 0 || length > MAX_SLICE_BYTES || offset >= zimTotalLength || (offset + length) < 0) {
-                                if (BuildConfig.DEBUG) {
+                                boolean isDebug = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+                                if (isDebug) {
                                     Log.w(TAG, "Petición a __zim_slice__ rechazada por límites: offset=" + offset + ", length=" + length);
                                 }
                                 return new WebResourceResponse("text/plain", "UTF-8", 400, "Bad Request",

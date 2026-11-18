@@ -48,15 +48,17 @@ export class NaturalVoiceService {
                 this.capTTS = window.Capacitor.Plugins.TextToSpeech;
                 const res = await this.capTTS.getSupportedVoices();
                 if (res && res.voices) {
-                    this.androidVoices = res.voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('es'));
-                    console.log(`[AndroidTTS] Voces en español detectadas (${this.androidVoices.length}):`, this.androidVoices.map(v => `${v.name} (${v.lang})`));
-                    if (this.androidVoices.length > 0) {
-                        this.selectedAndroidVoice = this.androidVoices[0];
-                        this.hasSpanishVoice = true;
-                    } else {
-                        this.hasSpanishVoice = false;
-                        console.warn('[AndroidTTS] ALERTA: No hay voces en español instaladas en el motor TTS.');
-                    }
+                    // Mapear cada voz con su índice original en el array global de Android TTS
+                    const allWithIndex = res.voices.map((v, i) => ({ ...v, globalIndex: i }));
+                    // Filtrar voces en español (priorizando las locales offline)
+                    const esAll = allWithIndex.filter(v => (v.lang || '').toLowerCase().startsWith('es'));
+                    const esLocal = esAll.filter(v => v.localService);
+
+                    this.androidVoices = esLocal.length > 0 ? esLocal : esAll;
+                    this.hasSpanishVoice = this.androidVoices.length > 0;
+
+                    console.log(`[AndroidTTS] Voces es-* disponibles (${this.androidVoices.length}):`,
+                        this.androidVoices.map(v => `${v.voiceURI} [idx=${v.globalIndex}]`));
                 }
             }
         } catch (e) {
@@ -259,7 +261,7 @@ export class NaturalVoiceService {
         this.playNextChunk();
     }
 
-    async speakWithAndroidTTS(text) {
+    async speakWithAndroidTTS(text, testOptions = null) {
         if (!this.capTTS) {
             if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
                 this.capTTS = window.Capacitor.Plugins.TextToSpeech;
@@ -274,36 +276,62 @@ export class NaturalVoiceService {
         const sessionId = this.currentSessionId;
         this.sessionEngine = 'android-native';
 
-        // Perfiles de voz diferenciados para niños en Android
-        let pitch = 1.12;
-        let rate = 1.05;
+        let targetVoiceIndex = -1;
+        let appliedVoiceURI = 'default';
+        let pitch = 1.0;
+        let rate = 1.0;
 
-        if (this.voiceStyle === 'cartoon_toon') {
-            // Ardillita / Toon Travieso
-            pitch = 1.45;
-            rate = 1.20;
-        } else if (this.voiceStyle === 'kid_soft') {
-            // Chiquillo / Amigo Tierno
-            pitch = 1.25;
-            rate = 0.95;
+        if (testOptions) {
+            // Calibración manual desde el panel de pruebas (solo debug)
+            targetVoiceIndex = typeof testOptions.voiceIndex === 'number' ? testOptions.voiceIndex : -1;
+            appliedVoiceURI = testOptions.voiceURI || 'custom';
+            pitch = typeof testOptions.pitch === 'number' ? testOptions.pitch : 1.0;
+            rate = typeof testOptions.rate === 'number' ? testOptions.rate : 1.0;
         } else {
-            // Flubber Muñeco Gracioso
-            pitch = 1.15;
-            rate = 1.06;
+            // Asignación objetiva según voces físicas disponibles en el dispositivo
+            const count = this.androidVoices.length;
+            let slot = 0;
+
+            if (this.voiceStyle === 'cartoon_toon') {
+                slot = count > 1 ? 1 : 0;
+                pitch = count > 1 ? 1.25 : 1.35;
+                rate = 1.15;
+            } else if (this.voiceStyle === 'kid_soft') {
+                slot = count > 2 ? 2 : (count > 1 ? 1 : 0);
+                pitch = count > 2 ? 1.10 : 0.95;
+                rate = 0.95;
+            } else {
+                // cartoon_flubber
+                slot = 0;
+                pitch = 1.05;
+                rate = 1.02;
+            }
+
+            if (count > 0) {
+                const assigned = this.androidVoices[slot] || this.androidVoices[0];
+                targetVoiceIndex = assigned.globalIndex;
+                appliedVoiceURI = assigned.voiceURI;
+            }
         }
 
+        // Registro objetivo en logcat vía consola de Capacitor
+        console.log(`[AndroidTTS_APPLIED] voiceURI="${appliedVoiceURI}", voiceIndex=${targetVoiceIndex}, pitch=${pitch.toFixed(2)}, rate=${rate.toFixed(2)}, style="${this.voiceStyle}"`);
+
         try {
-            await this.capTTS.speak({
+            const speakParams = {
                 text: text,
                 lang: 'es-ES',
                 rate: rate,
                 pitch: pitch,
                 volume: 1.0,
                 category: 'ambient'
-            });
+            };
+            if (targetVoiceIndex >= 0) {
+                speakParams.voice = targetVoiceIndex;
+            }
+            await this.capTTS.speak(speakParams);
         } catch (e) {
-            console.warn('[AndroidTTS] Error sintetizando texto:', e);
-            // Si el motor falla o no tiene voz es-ES, intentar con fallback genérico
+            console.warn('[AndroidTTS] Error sintetizando texto con voz nativa:', e);
             try {
                 await this.capTTS.speak({
                     text: text,
@@ -312,13 +340,23 @@ export class NaturalVoiceService {
                     pitch: pitch
                 });
             } catch (err2) {
-                console.warn('[AndroidTTS] Fallback también falló:', err2);
+                console.warn('[AndroidTTS] Fallback genérico también falló:', err2);
             }
         } finally {
             if (this.currentSessionId === sessionId) {
                 this.stop();
             }
         }
+    }
+
+    /**
+     * Calibrador interactivo temporal (solo para pruebas en builds debug)
+     */
+    async testVoiceAndroid(voiceIndex, pitch, rate, sampleText = '¡Hola explorador! Soy Gloop probando mi voz con este tono y velocidad.') {
+        const found = this.androidVoices.find(v => v.globalIndex === voiceIndex);
+        const uri = found ? found.voiceURI : `index_${voiceIndex}`;
+        console.log(`[AndroidTTS_TEST] Probando: voiceURI="${uri}", index=${voiceIndex}, pitch=${pitch}, rate=${rate}`);
+        await this.speakWithAndroidTTS(sampleText, { voiceIndex, voiceURI: uri, pitch, rate });
     }
 
     async playNextChunk() {

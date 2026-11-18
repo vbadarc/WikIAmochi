@@ -24,6 +24,10 @@ allprojects {
     }
 }
 
+subprojects {
+    layout.buildDirectory.set(new File(rootProject.layout.buildDirectory.asFile.get(), "subprojects/" + project.name))
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
