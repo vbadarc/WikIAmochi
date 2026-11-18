@@ -276,28 +276,43 @@ export class NaturalVoiceService {
         const sessionId = this.currentSessionId;
         this.sessionEngine = 'android-native';
 
+        const effectiveStyle = (testOptions && testOptions.style) ? testOptions.style : this.voiceStyle;
         let targetVoiceIndex = -1;
         let appliedVoiceURI = 'default';
         let pitch = 1.0;
         let rate = 1.0;
 
-        // Perfiles de voz claramente diferenciados para niños:
-        // 1. Ardillita (cartoon_toon): Aguda, ágil y simpática
-        // 2. Chiquillo (kid_soft): Tono infantil, dulce y pausado
-        // 3. Flubber (cartoon_flubber): Bonachona, redonda y amigable
-        if (this.voiceStyle === 'cartoon_toon') {
+        // Perfiles de voz base:
+        // 1. Flubber: Muñeco dulce, alegre y tierno
+        // 2. Ardillita: Aguda, ágil y vivaz (tipo cartoon)
+        // 3. Chiquillo: Tono infantil, suave y dulce
+        if (effectiveStyle === 'cartoon_toon') {
             pitch = 1.55;
             rate = 1.18;
             targetVoiceIndex = this.androidVoices.length > 1 ? 1 : 0;
-        } else if (this.voiceStyle === 'kid_soft') {
+        } else if (effectiveStyle === 'kid_soft') {
             pitch = 1.28;
             rate = 0.96;
             targetVoiceIndex = this.androidVoices.length > 2 ? 2 : 0;
         } else {
-            // cartoon_flubber
-            pitch = 0.90;
-            rate = 1.00;
+            // cartoon_flubber (Muñeco dulce)
+            pitch = 1.20;
+            rate = 1.02;
             targetVoiceIndex = 0;
+        }
+
+        // Si el usuario configuró valores personalizados en el engranaje, aplicarlos
+        try {
+            const customPitch = localStorage.getItem('wikia_pitch_' + effectiveStyle);
+            const customRate = localStorage.getItem('wikia_rate_' + effectiveStyle);
+            if (customPitch !== null && !isNaN(parseFloat(customPitch))) pitch = parseFloat(customPitch);
+            if (customRate !== null && !isNaN(parseFloat(customRate))) rate = parseFloat(customRate);
+        } catch (e) {}
+
+        // Si viene de una prueba interactiva en tiempo real del engranaje
+        if (testOptions) {
+            if (typeof testOptions.pitch === 'number') pitch = testOptions.pitch;
+            if (typeof testOptions.rate === 'number') rate = testOptions.rate;
         }
 
         if (this.androidVoices.length > 0 && targetVoiceIndex >= 0) {
@@ -305,7 +320,7 @@ export class NaturalVoiceService {
             appliedVoiceURI = assigned.voiceURI || 'native-es';
         }
 
-        console.log(`[AndroidTTS_APPLIED] style="${this.voiceStyle}", voiceURI="${appliedVoiceURI}", pitch=${pitch}, rate=${rate}`);
+        console.log(`[AndroidTTS_APPLIED] style="${effectiveStyle}", voiceURI="${appliedVoiceURI}", pitch=${pitch.toFixed(2)}, rate=${rate.toFixed(2)}`);
 
         try {
             const speakParams = {

@@ -971,32 +971,80 @@
                 
                 <div class="modal-body-scroll">
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; text-align: left;">
-                        <!-- Opción 1: Flubber -->
-                        <button class="voice-select-btn active" data-style="cartoon_flubber" style="padding: 12px 14px; border-radius: 16px; border: 2.5px solid var(--brand-blue); background: #E1F5FE; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
-                            <div>
-                                <div style="font-weight: 700; color: #0277BD; font-size: 14px;">Muñeco Flubber (Recomendado)</div>
-                                <div style="font-size: 11px; color: #546E7A;">Tono elástico, alegre y divertido</div>
+                        <!-- Opción 1: Flubber (Dulce y Tierno) -->
+                        <div class="voice-card-row" id="card_cartoon_flubber" style="background: white; border-radius: 16px; border: 2.5px solid var(--brand-blue); overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;">
+                                <div class="voice-select-trigger" data-style="cartoon_flubber" style="flex: 1; cursor: pointer;">
+                                    <div style="font-weight: 700; color: #0277BD; font-size: 14px;">Muñeco Flubber (Recomendado)</div>
+                                    <div style="font-size: 11px; color: #546E7A;">Tono dulce, alegre y tierno</div>
+                                </div>
+                                <button class="btn-voice-gear" data-target="gear_cartoon_flubber" style="background: none; border: none; font-size: 18px; padding: 6px; cursor: pointer;" title="Ajustar tono y velocidad">⚙️</button>
                             </div>
-                            <span style="font-size: 20px;">✨</span>
-                        </button>
+                            <div class="voice-gear-panel" id="gear_cartoon_flubber" style="display: none; background: #F1F8E9; border-top: 1px dashed #C8E6C9; padding: 10px 14px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Tono (Pitch): <b id="val_pitch_cartoon_flubber">1.20</b></span>
+                                </div>
+                                <input type="range" class="gear-pitch-slider" data-style="cartoon_flubber" min="0.60" max="1.80" step="0.05" value="1.20" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Velocidad (Rate): <b id="val_rate_cartoon_flubber">1.02</b></span>
+                                </div>
+                                <input type="range" class="gear-rate-slider" data-style="cartoon_flubber" min="0.60" max="1.60" step="0.05" value="1.02" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-gear-test" data-style="cartoon_flubber" style="flex: 1; padding: 6px; background: #00B0FF; color: white; border: none; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;">▶️ Probar</button>
+                                    <button class="btn-gear-reset" data-style="cartoon_flubber" data-default-pitch="1.20" data-default-rate="1.02" style="padding: 6px 10px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; cursor: pointer;">Restablecer</button>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Opción 2: Ardillita -->
-                        <button class="voice-select-btn" data-style="cartoon_toon" style="padding: 12px 14px; border-radius: 16px; border: 2px solid #ECEFF1; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
-                            <div>
-                                <div style="font-weight: 700; color: #7B1FA2; font-size: 14px;">Ardillita / Risueño</div>
-                                <div style="font-size: 11px; color: #546E7A;">Tono ágil, vivaz y alegre</div>
+                        <div class="voice-card-row" id="card_cartoon_toon" style="background: white; border-radius: 16px; border: 2px solid #ECEFF1; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;">
+                                <div class="voice-select-trigger" data-style="cartoon_toon" style="flex: 1; cursor: pointer;">
+                                    <div style="font-weight: 700; color: #7B1FA2; font-size: 14px;">Ardillita / Risueño</div>
+                                    <div style="font-size: 11px; color: #546E7A;">Tono ágil, vivaz y alegre</div>
+                                </div>
+                                <button class="btn-voice-gear" data-target="gear_cartoon_toon" style="background: none; border: none; font-size: 18px; padding: 6px; cursor: pointer;" title="Ajustar tono y velocidad">⚙️</button>
                             </div>
-                            <span style="font-size: 20px;">⚡</span>
-                        </button>
+                            <div class="voice-gear-panel" id="gear_cartoon_toon" style="display: none; background: #F3E5F5; border-top: 1px dashed #E1BEE7; padding: 10px 14px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Tono (Pitch): <b id="val_pitch_cartoon_toon">1.55</b></span>
+                                </div>
+                                <input type="range" class="gear-pitch-slider" data-style="cartoon_toon" min="0.60" max="1.90" step="0.05" value="1.55" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Velocidad (Rate): <b id="val_rate_cartoon_toon">1.18</b></span>
+                                </div>
+                                <input type="range" class="gear-rate-slider" data-style="cartoon_toon" min="0.60" max="1.60" step="0.05" value="1.18" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-gear-test" data-style="cartoon_toon" style="flex: 1; padding: 6px; background: #AB47BC; color: white; border: none; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;">▶️ Probar</button>
+                                    <button class="btn-gear-reset" data-style="cartoon_toon" data-default-pitch="1.55" data-default-rate="1.18" style="padding: 6px 10px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; cursor: pointer;">Restablecer</button>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Opción 3: Chiquillo -->
-                        <button class="voice-select-btn" data-style="kid_soft" style="padding: 12px 14px; border-radius: 16px; border: 2px solid #ECEFF1; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif;">
-                            <div>
-                                <div style="font-weight: 700; color: #2E7D32; font-size: 14px;">Chiquillo / Amigo Tierno</div>
-                                <div style="font-size: 11px; color: #546E7A;">Tono suave, dulce y tranquilo</div>
+                        <div class="voice-card-row" id="card_kid_soft" style="background: white; border-radius: 16px; border: 2px solid #ECEFF1; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;">
+                                <div class="voice-select-trigger" data-style="kid_soft" style="flex: 1; cursor: pointer;">
+                                    <div style="font-weight: 700; color: #2E7D32; font-size: 14px;">Chiquillo / Amigo Tierno</div>
+                                    <div style="font-size: 11px; color: #546E7A;">Tono suave, dulce y tranquilo</div>
+                                </div>
+                                <button class="btn-voice-gear" data-target="gear_kid_soft" style="background: none; border: none; font-size: 18px; padding: 6px; cursor: pointer;" title="Ajustar tono y velocidad">⚙️</button>
                             </div>
-                            <span style="font-size: 20px;">💚</span>
-                        </button>
+                            <div class="voice-gear-panel" id="gear_kid_soft" style="display: none; background: #E8F5E9; border-top: 1px dashed #C8E6C9; padding: 10px 14px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Tono (Pitch): <b id="val_pitch_kid_soft">1.28</b></span>
+                                </div>
+                                <input type="range" class="gear-pitch-slider" data-style="kid_soft" min="0.60" max="1.80" step="0.05" value="1.28" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Velocidad (Rate): <b id="val_rate_kid_soft">0.96</b></span>
+                                </div>
+                                <input type="range" class="gear-rate-slider" data-style="kid_soft" min="0.60" max="1.60" step="0.05" value="0.96" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-gear-test" data-style="kid_soft" style="flex: 1; padding: 6px; background: #43A047; color: white; border: none; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;">▶️ Probar</button>
+                                    <button class="btn-gear-reset" data-style="kid_soft" data-default-pitch="1.28" data-default-rate="0.96" style="padding: 6px 10px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; cursor: pointer;">Restablecer</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1264,32 +1312,77 @@
             } catch (e) {}
         }
 
-        // Gestión de Voces de los Personajes
+        // Gestión de Voces y Personalización con Engranajes
         let selectedVoice = null;
 
         function loadVoices() {
             updateVoiceButtonStates();
+            initGearSliders();
         }
 
         function updateVoiceButtonStates() {
             const currentStyle = localStorage.getItem('wikia_cartoon_style') || 'cartoon_flubber';
-            document.querySelectorAll('.voice-select-btn').forEach(btn => {
-                const s = btn.getAttribute('data-style');
-                if (s === currentStyle || (currentStyle === 'flubber' && s === 'cartoon_flubber')) {
-                    btn.classList.add('active');
-                    btn.style.borderColor = 'var(--brand-blue)';
-                    btn.style.background = '#E1F5FE';
+            const cards = [
+                { id: 'card_cartoon_flubber', style: 'cartoon_flubber', color: 'var(--brand-blue)', bg: '#E1F5FE' },
+                { id: 'card_cartoon_toon', style: 'cartoon_toon', color: '#AB47BC', bg: '#F3E5F5' },
+                { id: 'card_kid_soft', style: 'kid_soft', color: '#43A047', bg: '#E8F5E9' }
+            ];
+
+            cards.forEach(c => {
+                const el = document.getElementById(c.id);
+                if (!el) return;
+                const isSelected = (c.style === currentStyle || (currentStyle === 'flubber' && c.style === 'cartoon_flubber'));
+                if (isSelected) {
+                    el.style.borderColor = c.color;
+                    el.style.borderWidth = '2.5px';
                 } else {
-                    btn.classList.remove('active');
-                    btn.style.borderColor = '#ECEFF1';
-                    btn.style.background = 'white';
+                    el.style.borderColor = '#ECEFF1';
+                    el.style.borderWidth = '2px';
                 }
             });
         }
 
-        document.querySelectorAll('.voice-select-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const style = btn.getAttribute('data-style');
+        function initGearSliders() {
+            ['cartoon_flubber', 'cartoon_toon', 'kid_soft'].forEach(style => {
+                const pitchSlider = document.querySelector(`.gear-pitch-slider[data-style="${style}"]`);
+                const rateSlider = document.querySelector(`.gear-rate-slider[data-style="${style}"]`);
+                const pitchLabel = document.getElementById(`val_pitch_${style}`);
+                const rateLabel = document.getElementById(`val_rate_${style}`);
+
+                const savedPitch = localStorage.getItem('wikia_pitch_' + style);
+                const savedRate = localStorage.getItem('wikia_rate_' + style);
+
+                if (savedPitch && pitchSlider && pitchLabel) {
+                    pitchSlider.value = savedPitch;
+                    pitchLabel.textContent = parseFloat(savedPitch).toFixed(2);
+                }
+                if (savedRate && rateSlider && rateLabel) {
+                    rateSlider.value = savedRate;
+                    rateLabel.textContent = parseFloat(savedRate).toFixed(2);
+                }
+
+                if (pitchSlider && pitchLabel) {
+                    pitchSlider.addEventListener('input', () => {
+                        const val = parseFloat(pitchSlider.value).toFixed(2);
+                        pitchLabel.textContent = val;
+                        localStorage.setItem('wikia_pitch_' + style, val);
+                    });
+                }
+
+                if (rateSlider && rateLabel) {
+                    rateSlider.addEventListener('input', () => {
+                        const val = parseFloat(rateSlider.value).toFixed(2);
+                        rateLabel.textContent = val;
+                        localStorage.setItem('wikia_rate_' + style, val);
+                    });
+                }
+            });
+        }
+
+        // 1. Clic en el nombre/área de la voz para seleccionarla
+        document.querySelectorAll('.voice-select-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const style = trigger.getAttribute('data-style');
                 localStorage.removeItem('wikia_selected_voice_name');
                 selectedVoice = null;
                 localStorage.setItem('wikia_cartoon_style', style);
@@ -1297,12 +1390,65 @@
                 updateVoiceButtonStates();
 
                 if (style === 'cartoon_flubber') {
-                    speak('¡Hola, amiguito! Soy WikIAmochi. ¡Sueno como un muñequito de gelatina divertido!', 'curated');
+                    speak('¡Hola amiguito! Soy Gloop. ¡Mi voz suena dulce, alegre y tierna!', 'curated');
                 } else if (style === 'cartoon_toon') {
-                    speak('¡Yuju! ¡Mira qué voz de ardillita tan rápida y risueña tengo ahora! ¡Parece de dibujo animado!', 'curated');
+                    speak('¡Yuju! ¡Esta es mi voz de ardillita rápida y risueña!', 'curated');
                 } else {
-                    speak('¡Hola! Esta es mi voz suave y cariñosa de chiquillo, ¿a que mola?', 'curated');
+                    speak('¡Hola! Esta es mi voz suave y cariñosa de chiquillo.', 'curated');
                 }
+            });
+        });
+
+        // 2. Clic en el engranaje para abrir/cerrar ajustes finos
+        document.querySelectorAll('.btn-voice-gear').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const targetId = btn.getAttribute('data-target');
+                const panel = document.getElementById(targetId);
+                if (panel) {
+                    panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
+                }
+            });
+        });
+
+        // 3. Botones de prueba dentro del engranaje
+        document.querySelectorAll('.btn-gear-test').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const style = btn.getAttribute('data-style');
+                const pSlider = document.querySelector(`.gear-pitch-slider[data-style="${style}"]`);
+                const rSlider = document.querySelector(`.gear-rate-slider[data-style="${style}"]`);
+                const p = pSlider ? parseFloat(pSlider.value) : 1.0;
+                const r = rSlider ? parseFloat(rSlider.value) : 1.0;
+
+                if (voiceService.isCapacitorAndroid) {
+                    voiceService.speakWithAndroidTTS('¡Probando esta voz! Así es como suena ahora con este tono y velocidad.', { style, pitch: p, rate: r });
+                } else {
+                    speak('¡Probando esta voz! Así suena mi tono y rapidez.', 'curated');
+                }
+            });
+        });
+
+        // 4. Botones de restablecer valores recomendados
+        document.querySelectorAll('.btn-gear-reset').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const style = btn.getAttribute('data-style');
+                const defP = btn.getAttribute('data-default-pitch');
+                const defR = btn.getAttribute('data-default-rate');
+
+                const pSlider = document.querySelector(`.gear-pitch-slider[data-style="${style}"]`);
+                const rSlider = document.querySelector(`.gear-rate-slider[data-style="${style}"]`);
+                const pLabel = document.getElementById(`val_pitch_${style}`);
+                const rLabel = document.getElementById(`val_rate_${style}`);
+
+                if (pSlider) pSlider.value = defP;
+                if (rSlider) rSlider.value = defR;
+                if (pLabel) pLabel.textContent = parseFloat(defP).toFixed(2);
+                if (rLabel) rLabel.textContent = parseFloat(defR).toFixed(2);
+
+                localStorage.removeItem('wikia_pitch_' + style);
+                localStorage.removeItem('wikia_rate_' + style);
             });
         });
 
