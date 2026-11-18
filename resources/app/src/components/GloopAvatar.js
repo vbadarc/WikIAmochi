@@ -19,10 +19,10 @@ export class GloopAvatar {
         this.darkColor = options.darkColor || '#004D40';
         this.shadowColor = options.shadowColor || 'rgba(0, 230, 118, 0.55)';
 
-        // Dimensiones del lienzo
+        // Dimensiones del lienzo y radio de la mascota
         this.width = canvasElement.width;
         this.height = canvasElement.height;
-        this.baseRadius = 105;
+        this.baseRadius = 90;
 
         // Mirada y pupilas
         this.lookAtX = 0;
@@ -278,7 +278,8 @@ export class GloopAvatar {
     draw() {
         const ctx = this.ctx;
         const centerX = this.width / 2 + this.physics.x;
-        const centerY = this.height / 2 + 25 + this.physics.y;
+        // Posicionar el centro vertical ligeramente más abajo del centro para que la coronilla nunca se corte
+        const centerY = this.height / 2 + 10 + this.physics.y;
         const r = this.baseRadius;
 
         ctx.clearRect(0, 0, this.width, this.height);
