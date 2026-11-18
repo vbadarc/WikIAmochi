@@ -29,6 +29,39 @@ export class NaturalVoiceService {
         this.selectedSystemVoice = null;
         this.useSystemVoiceExplicitly = false;
         this.forceOfflineSpeech = false;
+
+        // Soporte nativo para Android TTS (Capacitor)
+        this.isCapacitorAndroid = typeof window !== 'undefined' && !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        this.capTTS = null;
+        this.androidVoices = [];
+        this.selectedAndroidVoice = null;
+        this.hasSpanishVoice = true;
+
+        if (this.isCapacitorAndroid) {
+            this.initAndroidTTS();
+        }
+    }
+
+    async initAndroidTTS() {
+        try {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
+                this.capTTS = window.Capacitor.Plugins.TextToSpeech;
+                const res = await this.capTTS.getSupportedVoices();
+                if (res && res.voices) {
+                    this.androidVoices = res.voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('es'));
+                    console.log(`[AndroidTTS] Voces en español detectadas (${this.androidVoices.length}):`, this.androidVoices.map(v => `${v.name} (${v.lang})`));
+                    if (this.androidVoices.length > 0) {
+                        this.selectedAndroidVoice = this.androidVoices[0];
+                        this.hasSpanishVoice = true;
+                    } else {
+                        this.hasSpanishVoice = false;
+                        console.warn('[AndroidTTS] ALERTA: No hay voces en español instaladas en el motor TTS.');
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[AndroidTTS] Error inicializando TTS nativo:', e);
+        }
     }
 
     getAudioContext() {
@@ -79,6 +112,12 @@ export class NaturalVoiceService {
                 this.currentSource.disconnect();
             } catch (e) {}
             this.currentSource = null;
+        }
+
+        if (this.capTTS) {
+            try {
+                this.capTTS.stop();
+            } catch (e) {}
         }
 
         if ('speechSynthesis' in window) {
@@ -207,10 +246,79 @@ export class NaturalVoiceService {
         }
 
         const normalizedText = this.normalizeNumbersForSpeech(text);
+
+        // Si estamos en Android nativo, delegar en el plugin oficial @capacitor-community/text-to-speech
+        if (this.isCapacitorAndroid) {
+            this.speakWithAndroidTTS(normalizedText);
+            return;
+        }
+
         const sentences = this.splitIntoSentences(normalizedText);
         this.audioQueue = [...sentences];
 
         this.playNextChunk();
+    }
+
+    async speakWithAndroidTTS(text) {
+        if (!this.capTTS) {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
+                this.capTTS = window.Capacitor.Plugins.TextToSpeech;
+            }
+        }
+
+        if (!this.capTTS) {
+            this.fallbackSystemVoice(text);
+            return;
+        }
+
+        const sessionId = this.currentSessionId;
+        this.sessionEngine = 'android-native';
+
+        // Perfiles de voz diferenciados para niños en Android
+        let pitch = 1.12;
+        let rate = 1.05;
+
+        if (this.voiceStyle === 'cartoon_toon') {
+            // Ardillita / Toon Travieso
+            pitch = 1.45;
+            rate = 1.20;
+        } else if (this.voiceStyle === 'kid_soft') {
+            // Chiquillo / Amigo Tierno
+            pitch = 1.25;
+            rate = 0.95;
+        } else {
+            // Flubber Muñeco Gracioso
+            pitch = 1.15;
+            rate = 1.06;
+        }
+
+        try {
+            await this.capTTS.speak({
+                text: text,
+                lang: 'es-ES',
+                rate: rate,
+                pitch: pitch,
+                volume: 1.0,
+                category: 'ambient'
+            });
+        } catch (e) {
+            console.warn('[AndroidTTS] Error sintetizando texto:', e);
+            // Si el motor falla o no tiene voz es-ES, intentar con fallback genérico
+            try {
+                await this.capTTS.speak({
+                    text: text,
+                    lang: 'es',
+                    rate: rate,
+                    pitch: pitch
+                });
+            } catch (err2) {
+                console.warn('[AndroidTTS] Fallback también falló:', err2);
+            }
+        } finally {
+            if (this.currentSessionId === sessionId) {
+                this.stop();
+            }
+        }
     }
 
     async playNextChunk() {
