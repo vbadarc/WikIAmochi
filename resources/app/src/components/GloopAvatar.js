@@ -24,6 +24,9 @@ export class GloopAvatar {
         this.height = canvasElement.height;
         this.baseRadius = 90;
 
+        // Optimización de RAM y GPU: limitar devicePixelRatio para evitar texturas gigantes en pantallas 1080p+
+        this.setupCanvasDpi();
+
         // Mirada y pupilas
         this.lookAtX = 0;
         this.lookAtY = 0;
@@ -54,6 +57,24 @@ export class GloopAvatar {
 
         this.initSensors();
         this.initInteractions();
+    }
+
+    setupCanvasDpi() {
+        // En móviles con pantallas 1080x2340 (DPR 2.75 o 3.0), limitar la resolución interna del canvas
+        // a un tamaño contenido (320x320 o DPR máx 1.5) reduce el uso de memoria de textura de 176 MB a ~40 MB
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const rect = this.canvas.getBoundingClientRect();
+        const displayW = rect.width > 0 ? rect.width : 280;
+        const displayH = rect.height > 0 ? rect.height : 280;
+
+        const internalSize = Math.round(Math.min(displayW, displayH) * dpr);
+        if (internalSize > 0 && (this.canvas.width !== internalSize || this.canvas.height !== internalSize)) {
+            this.canvas.width = internalSize;
+            this.canvas.height = internalSize;
+            this.width = internalSize;
+            this.height = internalSize;
+            this.baseRadius = Math.round(internalSize * 0.28);
+        }
     }
 
     playBounceSound(speed = 6) {
