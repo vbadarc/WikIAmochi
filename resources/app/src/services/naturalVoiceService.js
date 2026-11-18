@@ -281,41 +281,31 @@ export class NaturalVoiceService {
         let pitch = 1.0;
         let rate = 1.0;
 
-        if (testOptions) {
-            // Calibración manual desde el panel de pruebas (solo debug)
-            targetVoiceIndex = typeof testOptions.voiceIndex === 'number' ? testOptions.voiceIndex : -1;
-            appliedVoiceURI = testOptions.voiceURI || 'custom';
-            pitch = typeof testOptions.pitch === 'number' ? testOptions.pitch : 1.0;
-            rate = typeof testOptions.rate === 'number' ? testOptions.rate : 1.0;
+        // Perfiles de voz claramente diferenciados para niños:
+        // 1. Ardillita (cartoon_toon): Aguda, ágil y simpática
+        // 2. Chiquillo (kid_soft): Tono infantil, dulce y pausado
+        // 3. Flubber (cartoon_flubber): Bonachona, redonda y amigable
+        if (this.voiceStyle === 'cartoon_toon') {
+            pitch = 1.55;
+            rate = 1.18;
+            targetVoiceIndex = this.androidVoices.length > 1 ? 1 : 0;
+        } else if (this.voiceStyle === 'kid_soft') {
+            pitch = 1.28;
+            rate = 0.96;
+            targetVoiceIndex = this.androidVoices.length > 2 ? 2 : 0;
         } else {
-            // Asignación objetiva según voces físicas disponibles en el dispositivo
-            const count = this.androidVoices.length;
-            let slot = 0;
-
-            if (this.voiceStyle === 'cartoon_toon') {
-                slot = count > 1 ? 1 : 0;
-                pitch = count > 1 ? 1.25 : 1.35;
-                rate = 1.15;
-            } else if (this.voiceStyle === 'kid_soft') {
-                slot = count > 2 ? 2 : (count > 1 ? 1 : 0);
-                pitch = count > 2 ? 1.10 : 0.95;
-                rate = 0.95;
-            } else {
-                // cartoon_flubber
-                slot = 0;
-                pitch = 1.05;
-                rate = 1.02;
-            }
-
-            if (count > 0) {
-                const assigned = this.androidVoices[slot] || this.androidVoices[0];
-                targetVoiceIndex = assigned.globalIndex;
-                appliedVoiceURI = assigned.voiceURI;
-            }
+            // cartoon_flubber
+            pitch = 0.90;
+            rate = 1.00;
+            targetVoiceIndex = 0;
         }
 
-        // Registro objetivo en logcat vía consola de Capacitor
-        console.log(`[AndroidTTS_APPLIED] voiceURI="${appliedVoiceURI}", voiceIndex=${targetVoiceIndex}, pitch=${pitch.toFixed(2)}, rate=${rate.toFixed(2)}, style="${this.voiceStyle}"`);
+        if (this.androidVoices.length > 0 && targetVoiceIndex >= 0) {
+            const assigned = this.androidVoices[targetVoiceIndex] || this.androidVoices[0];
+            appliedVoiceURI = assigned.voiceURI || 'native-es';
+        }
+
+        console.log(`[AndroidTTS_APPLIED] style="${this.voiceStyle}", voiceURI="${appliedVoiceURI}", pitch=${pitch}, rate=${rate}`);
 
         try {
             const speakParams = {
@@ -326,8 +316,8 @@ export class NaturalVoiceService {
                 volume: 1.0,
                 category: 'ambient'
             };
-            if (targetVoiceIndex >= 0) {
-                speakParams.voice = targetVoiceIndex;
+            if (targetVoiceIndex >= 0 && this.androidVoices[targetVoiceIndex]) {
+                speakParams.voice = this.androidVoices[targetVoiceIndex].globalIndex;
             }
             await this.capTTS.speak(speakParams);
         } catch (e) {
@@ -347,16 +337,6 @@ export class NaturalVoiceService {
                 this.stop();
             }
         }
-    }
-
-    /**
-     * Calibrador interactivo temporal (solo para pruebas en builds debug)
-     */
-    async testVoiceAndroid(voiceIndex, pitch, rate, sampleText = '¡Hola explorador! Soy Gloop probando mi voz con este tono y velocidad.') {
-        const found = this.androidVoices.find(v => v.globalIndex === voiceIndex);
-        const uri = found ? found.voiceURI : `index_${voiceIndex}`;
-        console.log(`[AndroidTTS_TEST] Probando: voiceURI="${uri}", index=${voiceIndex}, pitch=${pitch}, rate=${rate}`);
-        await this.speakWithAndroidTTS(sampleText, { voiceIndex, voiceURI: uri, pitch, rate });
     }
 
     async playNextChunk() {

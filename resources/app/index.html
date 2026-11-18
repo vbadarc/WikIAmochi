@@ -579,36 +579,10 @@
             background: linear-gradient(135deg, #FF1744 0%, #D50000 100%);
         }
 
-        .mic-btn.locked {
-            background: #ECEFF1;
-            color: #78909C;
-            box-shadow: none;
-            border: 2px solid #CFD8DC;
-            font-size: 18px;
-        }
-
         .mic-btn.processing {
             background: linear-gradient(135deg, #FFB300 0%, #FB8C00 100%);
             box-shadow: 0 8px 20px rgba(255, 179, 0, 0.4);
             animation: pulse-mic 0.8s infinite ease-in-out;
-        }
-
-        #chkEnableMic:checked + #chkMicSlider {
-            background-color: #00E676;
-        }
-        #chkMicSlider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-        #chkEnableMic:checked + #chkMicSlider:before {
-            transform: translateX(20px);
         }
 
         @keyframes pulse-mic {
@@ -1024,33 +998,6 @@
                             <span style="font-size: 20px;">💚</span>
                         </button>
                     </div>
-
-                    <!-- Voces del dispositivo (adaptado por plataforma) -->
-                    <div style="text-align: left; margin-bottom: 14px;">
-                        <div id="deviceVoicesTitle" style="font-size: 12px; font-weight: 700; color: #37474F; margin-bottom: 4px;">🎙️ Voces del dispositivo:</div>
-                        <div id="systemVoicesContainer" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;"></div>
-                    </div>
-
-                    <!-- Calibrador Temporal de Pruebas (Solo visible en builds debug) -->
-                    <div id="debugVoiceTester" style="display: none; background: #FFF8E1; border: 1.5px dashed #FFB300; border-radius: 16px; padding: 12px; margin-top: 10px; text-align: left;">
-                        <div style="font-size: 12px; font-weight: 700; color: #F57F17; margin-bottom: 4px;">🧪 Calibrador de Voces (Modo Debug)</div>
-                        <div style="font-size: 11px; color: #6D4C41; margin-bottom: 8px;">Prueba las voces disponibles con distintos tonos y velocidades:</div>
-
-                        <label style="font-size: 11px; font-weight: 600; color: #37474F; display: block; margin-bottom: 2px;">Voz es-* detectada:</label>
-                        <select id="debugVoiceSelect" style="width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #CCC; font-family: 'Fredoka', sans-serif; font-size: 11px; margin-bottom: 8px;"></select>
-
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #37474F;">
-                            <span>Tono (Pitch): <b id="debugPitchVal">1.05</b></span>
-                        </div>
-                        <input type="range" id="debugPitchRange" min="0.5" max="2.0" step="0.05" value="1.05" style="width: 100%; margin-bottom: 8px;">
-
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #37474F;">
-                            <span>Velocidad (Rate): <b id="debugRateVal">1.02</b></span>
-                        </div>
-                        <input type="range" id="debugRateRange" min="0.5" max="2.0" step="0.05" value="1.02" style="width: 100%; margin-bottom: 10px;">
-
-                        <button id="btnDebugPlayVoice" style="width: 100%; padding: 8px; background: #FF8F00; color: white; border: none; border-radius: 10px; font-weight: 700; font-family: 'Fredoka', sans-serif; cursor: pointer;">▶️ Escuchar prueba de voz</button>
-                    </div>
                 </div>
 
                 <div class="modal-buttons">
@@ -1071,20 +1018,6 @@
                     <div id="pinModeDisplay" style="background: #F1F8E9; border-radius: 14px; padding: 10px; margin-bottom: 12px; text-align: center;">
                         <div style="font-size: 11px; font-weight: 700; color: #546E7A; text-transform: uppercase;">Modo de la Enciclopedia</div>
                         <div id="pinCurrentModeLabel" style="font-size: 13px; font-weight: 700; color: #2E7D32; margin-top: 2px;">🟢 WikIAmochi 100% Offline</div>
-                    </div>
-
-                    <!-- Ajuste del Micrófono (Desactivado por defecto) -->
-                    <div id="micSettingBox" style="background: #F4F6F8; border: 1.5px solid #CFD8DC; border-radius: 16px; padding: 12px; margin-bottom: 14px; text-align: left;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 13px; font-weight: 700; color: #263238;">🎤 Permitir hablar con el micro</span>
-                            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
-                                <input type="checkbox" id="chkEnableMic" style="opacity: 0; width: 0; height: 0;">
-                                <span id="chkMicSlider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #B0BEC5; transition: .3s; border-radius: 24px;"></span>
-                            </label>
-                        </div>
-                        <p style="font-size: 11px; color: #546E7A; line-height: 1.35; margin: 0;">
-                            <b>Información para el adulto:</b> Convierte la voz del niño en texto para buscar. WikIAmochi no almacena ni comparte grabaciones. El reconocimiento utiliza el motor oficial de Android (procesamiento en el dispositivo si está disponible, o mediante el servicio de voz de Google).
-                        </p>
                     </div>
 
                     <div id="pinInputSection" style="margin-bottom: 12px;">
@@ -1331,140 +1264,12 @@
             } catch (e) {}
         }
 
-        // Gestión de Voces y Preferencias
+        // Gestión de Voces de los Personajes
         let selectedVoice = null;
-        let availableVoices = [];
 
         function loadVoices() {
-            const isAndroid = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-            const titleEl = document.getElementById('deviceVoicesTitle');
-
-            if (isAndroid) {
-                if (titleEl) titleEl.textContent = '📱 Voces del dispositivo Android (100% Offline):';
-                availableVoices = (voiceService.androidVoices || []).map(v => ({
-                    name: v.voiceURI,
-                    lang: v.lang,
-                    localService: v.localService,
-                    globalIndex: v.globalIndex
-                }));
-                renderVoiceList();
-                setupDebugVoiceTester();
-                return;
-            }
-
-            if (titleEl) titleEl.textContent = '🎙️ Voz de Windows de respaldo (para equipos sin internet):';
-            if (!('speechSynthesis' in window)) return;
-            availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('es'));
-
-            const savedVoiceName = localStorage.getItem('wikia_selected_voice_name');
-            if (savedVoiceName && availableVoices.length > 0) {
-                const found = availableVoices.find(v => v.name === savedVoiceName);
-                if (found) {
-                    selectedVoice = found;
-                    voiceService.setVoice('system', found);
-                } else {
-                    selectedVoice = null;
-                }
-            } else {
-                selectedVoice = null;
-            }
-            renderVoiceList();
-        }
-
-        function setupDebugVoiceTester() {
-            const tester = document.getElementById('debugVoiceTester');
-            const select = document.getElementById('debugVoiceSelect');
-            const pitchRange = document.getElementById('debugPitchRange');
-            const rateRange = document.getElementById('debugRateRange');
-            const pitchVal = document.getElementById('debugPitchVal');
-            const rateVal = document.getElementById('debugRateVal');
-            const btnPlay = document.getElementById('btnDebugPlayVoice');
-
-            if (!tester || !select) return;
-
-            // Mostrar solo en debug (localhost en Capacitor WebView)
-            const isDebug = window.location.hostname === 'localhost' || location.search.includes('debug=1');
-            if (!isDebug) {
-                tester.style.display = 'none';
-                return;
-            }
-            tester.style.display = 'block';
-
-            select.innerHTML = '';
-            (voiceService.androidVoices || []).forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v.globalIndex;
-                opt.textContent = `${v.voiceURI} (${v.lang})`;
-                select.appendChild(opt);
-            });
-
-            pitchRange?.addEventListener('input', () => {
-                if (pitchVal) pitchVal.textContent = parseFloat(pitchRange.value).toFixed(2);
-            });
-            rateRange?.addEventListener('input', () => {
-                if (rateVal) rateVal.textContent = parseFloat(rateRange.value).toFixed(2);
-            });
-
-            btnPlay?.addEventListener('click', () => {
-                const idx = parseInt(select.value, 10);
-                const p = parseFloat(pitchRange.value);
-                const r = parseFloat(rateRange.value);
-                voiceService.testVoiceAndroid(idx, p, r);
-            });
-        }
-
-        function renderVoiceList() {
-            const container = document.getElementById('systemVoicesContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            if (availableVoices.length === 0) {
-                container.innerHTML = '<p style="font-size: 11px; color: #78909C; padding: 6px;">No se encontraron voces locales en español.</p>';
-                return;
-            }
-
-            availableVoices.forEach(voice => {
-                const isCurrent = selectedVoice && selectedVoice.name === voice.name;
-                const item = document.createElement('div');
-                item.className = 'voice-item';
-                item.style.padding = '8px 12px';
-                item.style.borderRadius = '12px';
-                item.style.border = isCurrent ? '2px solid var(--brand-blue)' : '1.5px solid #ECEFF1';
-                item.style.cursor = 'pointer';
-                item.style.fontSize = '12px';
-                item.style.background = isCurrent ? '#E1F5FE' : 'white';
-                item.style.display = 'flex';
-                item.style.justifyContent = 'space-between';
-                item.style.alignItems = 'center';
-
-                const tag = voice.localService ? 'Offline Local' : (voice.name.includes('Desktop') ? 'Offline Estándar' : 'Offline Natural');
-
-                item.innerHTML = `
-                    <div>
-                        <div style="font-weight: 700; color: #37474F;">${voice.name}</div>
-                        <div style="font-size: 10px; color: #90A4AE;">${voice.lang} • ${tag}</div>
-                    </div>
-                    ${isCurrent ? '<span style="font-size: 14px;">✓</span>' : ''}
-                `;
-
-                item.addEventListener('click', () => {
-                    selectedVoice = voice;
-                    localStorage.setItem('wikia_selected_voice_name', voice.name);
-
-                    document.querySelectorAll('#systemVoicesContainer .voice-item').forEach(v => {
-                        v.style.borderColor = '#ECEFF1';
-                        v.style.background = 'white';
-                    });
-                    item.style.borderColor = 'var(--brand-blue)';
-                    item.style.background = '#E1F5FE';
-
-                    voiceService.setVoice('system', voice);
-                    speak('¡Hola! Soy WikIAmochi. Ahora hablo con la voz de ' + voice.name.split(' ')[0] + ' de forma suave y sin internet.', 'curated');
-                    renderVoiceList();
-                });
-
-                container.appendChild(item);
-            });
+            // En ambas plataformas, la selección se hace por personaje (Flubber, Ardillita, Chiquillo)
+            updateVoiceButtonsVisual();
         }
 
         if ('speechSynthesis' in window) {
@@ -1782,46 +1587,13 @@
         // Control y Privacidad del Micrófono (Desactivado por defecto)
         // ==========================================
         const isAndroidPlatform = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-        let micEnabled = !isAndroidPlatform; // Desactivado por defecto en Android; activo en escritorio
         let micState = 'idle'; // 'idle' | 'listening' | 'processing'
         let silenceTimeout = null;
-        const chkEnableMic = document.getElementById('chkEnableMic');
-
-        async function initMicPreferences() {
-            if (isAndroidPlatform) {
-                try {
-                    if (window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences) {
-                        const res = await window.Capacitor.Plugins.Preferences.get({ key: 'wikiamochi_mic_enabled' });
-                        micEnabled = (res && res.value === 'true');
-                    } else {
-                        micEnabled = (localStorage.getItem('wikiamochi_mic_enabled') === 'true');
-                    }
-                } catch (e) {
-                    micEnabled = (localStorage.getItem('wikiamochi_mic_enabled') === 'true');
-                }
-            } else {
-                micEnabled = true;
-            }
-            updateMicButtonVisual();
-        }
 
         function updateMicButtonVisual() {
-            if (chkEnableMic) chkEnableMic.checked = micEnabled;
-
-            if (isAndroidPlatform) {
-                if (!micEnabled) {
-                    btnMic.classList.add('locked');
-                    btnMic.innerHTML = '🔒';
-                    btnMic.title = 'Micrófono desactivado. Un adulto puede activarlo en Ajustes.';
-                } else {
-                    btnMic.classList.remove('locked');
-                    btnMic.innerHTML = '🎤';
-                    btnMic.title = 'Hablarle a Gloop';
-                }
-            } else {
-                btnMic.classList.remove('locked');
-                btnMic.innerHTML = '🎤';
-            }
+            btnMic.classList.remove('locked');
+            btnMic.innerHTML = '🎤';
+            btnMic.title = 'Hablarle a Gloop';
         }
 
         function cancelListening(feedback = null) {
@@ -1849,7 +1621,7 @@
         async function startAndroidListening() {
             const SpeechRec = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
             if (!SpeechRec) {
-                speechTextEl.textContent = '¡Gloop! El servicio de voz no está listo en este dispositivo.';
+                speechTextEl.textContent = '¡Gloop! El servicio de voz no está disponible en este dispositivo.';
                 return;
             }
 
@@ -1861,7 +1633,7 @@
                 if (!hasPerm || !hasPerm.permission) {
                     const req = await SpeechRec.requestPermissions();
                     if (!req || !req.permission) {
-                        speechTextEl.textContent = '🔒 Para usar el micrófono, un adulto debe conceder el permiso en el móvil.';
+                        speechTextEl.textContent = '¡Gloop! Necesito permiso para poder escucharte cuando hables.';
                         cancelListening();
                         return;
                     }
@@ -1870,7 +1642,7 @@
                 micState = 'listening';
                 btnMic.classList.add('listening');
                 btnMic.classList.remove('processing');
-                speechTextEl.textContent = '¡Te escucho con atención! Háblale a Gloop...';
+                speechTextEl.textContent = '¡Te escucho! Háblale a Gloop...';
 
                 // Límite de 10 s de silencio
                 silenceTimeout = setTimeout(() => {
@@ -1945,11 +1717,6 @@
         }
 
         btnMic.addEventListener('click', () => {
-            if (isAndroidPlatform && !micEnabled) {
-                speechTextEl.textContent = '🔒 El micrófono está desactivado por protección infantil. Un adulto puede activarlo en Ajustes.';
-                return;
-            }
-
             if (micState === 'listening') {
                 cancelListening('Escucha cancelada.');
                 return;
@@ -1971,7 +1738,7 @@
             }
         });
 
-        initMicPreferences();
+        updateMicButtonVisual();
 
         // Acciones y toques
         document.getElementById('btnPoke').addEventListener('click', () => {
@@ -2111,42 +1878,6 @@
                 inputPinCode.value = '';
                 inputPinCode.focus();
                 return;
-            }
-
-            // Gestionar cambio de estado del micrófono por el adulto
-            const wantMic = chkEnableMic ? chkEnableMic.checked : false;
-            if (wantMic !== micEnabled) {
-                if (wantMic && isAndroidPlatform) {
-                    const SpeechRec = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
-                    if (SpeechRec) {
-                        try {
-                            const req = await SpeechRec.requestPermissions();
-                            if (!req || !req.permission) {
-                                pinFeedback.style.color = '#E65100';
-                                pinFeedback.textContent = '⚠️ Permiso de micrófono denegado en el sistema.';
-                                if (chkEnableMic) chkEnableMic.checked = false;
-                                return;
-                            }
-                        } catch (pErr) {
-                            console.warn('Error solicitando permisos al adulto:', pErr);
-                        }
-                    }
-                }
-
-                micEnabled = wantMic;
-                localStorage.setItem('wikiamochi_mic_enabled', micEnabled ? 'true' : 'false');
-                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences) {
-                    try {
-                        await window.Capacitor.Plugins.Preferences.set({
-                            key: 'wikiamochi_mic_enabled',
-                            value: micEnabled ? 'true' : 'false'
-                        });
-                    } catch (e) {}
-                }
-                updateMicButtonVisual();
-                if (!micEnabled) {
-                    cancelListening();
-                }
             }
 
             closePinModal();
