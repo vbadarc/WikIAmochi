@@ -59,4 +59,6 @@ tools/*.jar
 tools/*.keystore
 tools/*.json
 tools/*.tmp
+tools/*.cjs
+tools/*.png
 tools/temp-test.*

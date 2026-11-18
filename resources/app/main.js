@@ -1,6 +1,11 @@
 'use strict';
 
 const { app, BrowserWindow, ipcMain, nativeImage } = require('electron');
+const debugPortArg = process.argv.find(a => a.startsWith('--remote-debugging-port='));
+if (debugPortArg) {
+    const port = debugPortArg.split('=')[1];
+    app.commandLine.appendSwitch('remote-debugging-port', port);
+}
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
