@@ -25,8 +25,11 @@ bin/
 resources/app/voice_cache/
 resources/app/learned_knowledge.json
 
-# Artefactos de build web generado para Capacitor (solo en la raíz)
+# Artefactos de build web generado para Capacitor (solo en la raíz y copia en assets/public)
 /www/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
 
 # Credenciales, firmas y configuración local de Android (NUNCA subir al repo)
 *.keystore
@@ -46,3 +49,14 @@ android/captures/
 *.log
 .DS_Store
 Thumbs.db
+\
+
+.gradle_home/
+tools/bundletool.jar
+tools/*.apks
+
+tools/*.jar
+tools/*.keystore
+tools/*.json
+tools/*.tmp
+tools/temp-test.*

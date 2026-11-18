@@ -25,6 +25,7 @@
 ## 2. Verificación Oficial de Requisitos de Google Play (2025/2026)
 
 ### 2.1 Nivel de API Objetivo (`targetSdk`) Exigido Hoy por Google Play
+
 * **Valor exigido:**
   * Desde el 31 de agosto de 2025, Google Play exige como mínimo **Android 15 (API nivel 35)** para aplicaciones nuevas y actualizaciones (`targetSdk = 35`).
   * A partir del ciclo 2026 (31 de agosto de 2026), el requisito para nuevas aplicaciones y actualizaciones en móviles y tablets sube a **Android 16 (API nivel 36)** (`targetSdk = 36`), manteniéndose **API 35** como umbral de descubribilidad para apps existentes.
@@ -34,6 +35,7 @@
 * **Requisito adicional de Android 15+ (API 35+):** Compatibilidad obligatoria con **páginas de memoria de 16 KB** (`https://developer.android.com/guide/practices/page-sizes`). Dado que WikIAmochi ejecuta `libzim` en **WebAssembly (`libzim-wasm.wasm`)** dentro del WebView del sistema y no empaqueta librerías `.so` propias sin alinear, y usaremos Android Gradle Plugin 8.7+ con Capacitor actualizado, el binario cumple con la alineación de 16 KB.
 
 ### 2.2 Límites Oficiales de Tamaño en Google Play y Estimación del AAB
+
 * **Referencias oficiales abiertas consultadas:**
   1. Android Developers — *Play Asset Delivery*: `https://developer.android.com/guide/playcore/asset-delivery`
   2. Google Play Console Help — *Maximum size limits for Android App Bundles*: `https://support.google.com/googleplay/android-developer/answer/9859152`
@@ -46,6 +48,7 @@
   * Tomando como referencia conservadora el límite de **200 MB** para el módulo base (`base`), el AAB completo (**~131,4 MB**) cabe con una holgura de **~68,6 MB** dentro del propio módulo base (o mediante un asset pack `install-time`), garantizando que la app funcione 100% offline desde el instante de su instalación en Google Play sin descargas adicionales en el primer inicio.
 
 ### 2.3 Arquitectura Síncrona de Lectura del ZIM en Android (Candidata A2 vs. Alternativa B)
+
 * **Restricción técnica de `libzim-wasm.js`:** Dentro del Web Worker, Emscripten realiza lecturas de bloques mediante la interfaz POSIX síncrona `stream_ops.read(stream, buffer, offset, length, position)`. Dado que los plugins estándar de Capacitor son asíncronos, no pueden invocarse directamente desde `stream_ops.read`.
 * **Candidata A2 (Principal — Servidor Local de Rangos con `shouldInterceptRequest` + `XMLHttpRequest` Síncrono en Worker):**
   1. El archivo `.zim` se empaqueta sin comprimir (`noCompress "zim"`).
@@ -61,12 +64,15 @@
 ## 3. Análisis de APIs y Reutilización Desktop vs. Android
 
 ### 3.1 Qué se Reutiliza Tal Cual
+
 * **`src/components/GloopAvatar.js` y `src/core/sensors/slimePhysics.js`:** Motor físico de muelles e hidratación visual en Canvas 2D. Funciona al 100% en Android WebView. Se añadirá control de pausa en `visibilitychange` / `appStateChange` y ajuste dinámico de partículas para mantener 60 FPS en dispositivos de gama baja.
 * **`src/brain/aiPersonality.js` y `src/brain/kidKnowledgeBase.js`:** Motor determinista de plantillas, normalización de texto y filtro infantil (`blockedTopics`). **No contiene IA generativa ni LLMs.**
 * **`lib/www/js/libzim-wasm.js`, `libzim-wasm.wasm` y `libzim-asm.js`:** Compilación oficial Emscripten de `libzim` que soporta tanto `NODEFS` (en Electron) como `WORKERFS` / lectura por bloques en Web Worker.
 
 ### 3.2 Qué Hay que Adaptar (Capa de Abstracción `src/platform/platformAdapter.js`)
+
 Para cumplir la Regla 1 (no romper Electron y aislar llamadas nativas):
+
 1. **Lectura del archivo ZIM (`zim:search` y `zim:image`):**
    * En **Electron:** delega en `window.gloopAPI.searchVikidia` y `window.gloopAPI.getImageData` (`libzimNodeWorker.cjs`).
    * En **Android (Capacitor):** ejecuta `libzim-wasm.js` en Web Worker leyendo por rangos mediante la Candidata A2 (con Alternativa B de respaldo).
@@ -111,3 +117,35 @@ Cumpliendo con la Condición 6, se ha auditado el origen y régimen legal de cad
    * Añadiremos en la interfaz un botón **"ℹ️ Acerca de y Licencias"** que muestra la licencia **GPLv3** de la app, la atribución a **Vikidia (CC BY-SA)**, **Wikimedia Commons** y **Kiwix/libzim**, protegiendo cualquier enlace externo tras la **Puerta Parental**.
 2. **Modo Online y Política de Familias:**
    * En Android, el modo Online estará **desactivado por defecto** (`100% Offline`), solo podrá activarse tras superar una **Puerta Parental reforzada** (reto aritmético para adultos + PIN de 4 dígitos) y consultará **únicamente la API de Vikidia (`es.vikidia.org`)** con HTTPS y filtro infantil estricto, deshabilitando Wikipedia general para garantizar que solo se reciba contenido redactado para niños de 8 a 13 años.
+
+---
+
+## 6. Versiones del Toolchain Android y Resultados Medidos del Spike del ZIM (`spike/zim`)
+
+### 6.1 Versiones Exactas Configuradas y Verificadas
+
+| Componente | Versión Exacta | Verificación de Compatibilidad con API 36 |
+| :--- | :--- | :--- |
+| **Capacitor (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`)** | **`8.6.2`** | Última versión estable de Capacitor 8 |
+| **Android Gradle Plugin (AGP)** | **`8.13.0`** | Soporta oficialmente `compileSdk 36` y `targetSdk 36` |
+| **Gradle Wrapper** | **`8.14.3`** | Compatible con AGP 8.13.0 y JDK 21 |
+| **JDK** | **`21`** (OpenJDK / Oracle JDK 21) | Requerido por AGP 8.x y Capacitor 8 |
+| **`compileSdkVersion` / `targetSdkVersion` / `minSdkVersion`** | **`36` / `36` / `24`** | Compilado contra `platforms/android-36` y `build-tools/36.0.0` |
+
+### 6.2 Resultados Medidos del Spike del ZIM en Emulador (`WikIAmochi_API36_2GB`, Android 16 API 36 Google Play, 2 GB RAM)
+
+Se implementó y probó la **Candidata A2 (`A2_DIRECT_ASSET_FD`)** en la rama `spike/zim`:
+* `MainActivity.java` abre un `AssetFileDescriptor` directo sobre `vikidia_es_all_maxi_2026-09.zim` empaquetado sin comprimir (`noCompress 'zim'`) y intercepta peticiones `https://localhost/__zim_slice__?offset=X&length=Y` en `shouldInterceptRequest` realizando lecturas atómicas con `Os.pread` sobre el descriptor nativo.
+* Dentro del Web Worker (`zimWorkerBootstrap.js`), se intercepta `FileReaderSync.prototype.readAsArrayBuffer(blobSlice)` para servir las rebanadas del ZIM de forma **100% síncrona** mediante `XMLHttpRequest` síncrono (`xhr.open('GET', url, false)`) con una caché LRU en memoria de 32 páginas de 128 KB (máx. 4 MB).
+
+| Métrica Medida en Emulador (`WikIAmochi_API36_2GB`) | Valor Medido Real | Evidencia |
+| :--- | :--- | :--- |
+| **Modo de apertura del ZIM** | `A2_DIRECT_ASSET_FD` (`AssetFileDescriptor` + `Os.pread`) | `ZimReady: Mode=A2_DIRECT_ASSET_FD, Size=133548765, Offset=5747616, SetupMs=0` |
+| **Tiempo de preparación del descriptor ZIM** | **`0 ms`** | Sin copia a `filesDir` |
+| **Tiempo de primer arranque en frío (`am start -W`, `COLD`)** | **`2.461 ms` – `3.503 ms`** | `TotalTime: 2461` / `3503` |
+| **Carga de `libzim-wasm.wasm` y montaje del archivo ZIM** | **`3.468 ms`** | `ZIM loaded in 3468 ms` |
+| **Búsqueda de artículo (`"delfín"`) + extracción de snippet + imagen Base64** | **`1.020 ms`** (`301 ms` en Xapian) | `SPIKE_OK title="Delphinidae" searchMs=1020 snippetLen=140 imageBase64Len=771` |
+| **Memoria RAM total de la app (`dumpsys meminfo`, TOTAL PSS)** | **`114.343 KB` (~111,6 MB)** | Native Heap: `20.588 KB`, Dalvik Heap: `3.940 KB`, Swap PSS: `4.845 KB` |
+| **Espacio ocupado por el APK instalado (`/data/app/...`)** | **`134 MB`** | Incluye el ZIM de 127,36 MB sin comprimir |
+| **Espacio en datos internos (`/data/data/com.wikiamochi.app`)** | **`4,8 MB`** (`files/` = **`0 bytes` del ZIM**) | **El ZIM NO queda duplicado en el dispositivo** |
+

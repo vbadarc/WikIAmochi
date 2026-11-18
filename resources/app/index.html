@@ -727,6 +727,22 @@
 <body>
 
     <main class="app-shell">
+        <!-- Pantalla de Carga Infantil sin bloqueo de UI -->
+        <div id="appLoadingSplash" style="position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(160deg, #E8F4F8 0%, #F3E5F5 45%, #E8F8F5 80%, #FFFDE7 100%); transition: opacity 0.4s ease, visibility 0.4s ease; font-family: 'Fredoka', 'Nunito', sans-serif;">
+            <div style="font-size: 72px; animation: bounceGloop 1.2s infinite alternate ease-in-out; margin-bottom: 12px; filter: drop-shadow(0 12px 20px rgba(0, 230, 118, 0.35));">🍮</div>
+            <h1 style="font-size: 28px; color: #0277BD; margin-bottom: 6px; font-weight: 700; letter-spacing: -0.5px;">WikIAmochi</h1>
+            <p id="splashStatusText" style="font-size: 14px; color: #546E7A; margin-bottom: 20px; font-weight: 600;">Despertando a la mascota de gelatina...</p>
+            <div style="width: 220px; height: 10px; background: rgba(0, 176, 255, 0.18); border-radius: 999px; overflow: hidden; position: relative;">
+                <div id="splashProgressBar" style="width: 35%; height: 100%; background: linear-gradient(90deg, #00E676, #00B0FF); border-radius: 999px; transition: width 0.3s ease;"></div>
+            </div>
+            <style>
+                @keyframes bounceGloop {
+                    0% { transform: translateY(0) scale(1, 0.95); }
+                    100% { transform: translateY(-24px) scale(0.96, 1.05); }
+                }
+            </style>
+        </div>
+
         <header class="top-navbar">
             <button class="status-pill toggleable" id="btnToggleOffline" type="button" title="Pulsar para alternar libremente entre WikIAmochi Offline e Híbrido">
                 <div class="status-dot" id="statusDot"></div>
@@ -898,11 +914,14 @@
     </main>
 
     <script type="module">
+        import { ensurePlatformBridge } from './src/platform/platformAdapter.js';
         import { GloopAvatar } from './src/components/GloopAvatar.js';
         import { GloopPersonality } from './src/brain/aiPersonality.js';
         import { OnlineLearner } from './src/brain/onlineLearner.js';
         import { NaturalVoiceService } from './src/services/naturalVoiceService.js';
         import { ProfileManager } from './src/core/profile/profileManager.js';
+
+        ensurePlatformBridge();
 
         const canvas = document.getElementById('gloopCanvas');
         const avatar = new GloopAvatar(canvas);
@@ -912,6 +931,56 @@
         const learner = new OnlineLearner(personality);
         const voiceService = new NaturalVoiceService();
         const profileManager = new ProfileManager();
+
+        // Control suave de ocultación del Splash de Carga
+        const appLoadingSplash = document.getElementById('appLoadingSplash');
+        const splashStatusText = document.getElementById('splashStatusText');
+        const splashProgressBar = document.getElementById('splashProgressBar');
+
+        function dismissLoadingSplash() {
+            if (!appLoadingSplash) return;
+            if (splashProgressBar) splashProgressBar.style.width = '100%';
+            if (splashStatusText) splashStatusText.textContent = '¡Listo para jugar y aprender! ✨';
+            setTimeout(() => {
+                appLoadingSplash.style.opacity = '0';
+                appLoadingSplash.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    appLoadingSplash.style.display = 'none';
+                }, 400);
+            }, 300);
+        }
+
+        // Si la bóveda enciclopédica ya está lista o cuando termine su preparación asíncrona en el worker
+        if (window.gloopAPI && typeof window.gloopAPI.getStatus === 'function') {
+            window.gloopAPI.getStatus().then((st) => {
+                if (st && st.ready) {
+                    dismissLoadingSplash();
+                } else {
+                    if (splashProgressBar) splashProgressBar.style.width = '75%';
+                    if (splashStatusText) splashStatusText.textContent = 'Abriendo la gran enciclopedia infantil... 📚';
+                    const checkInterval = setInterval(async () => {
+                        try {
+                            const current = await window.gloopAPI.getStatus();
+                            if (current && current.ready) {
+                                clearInterval(checkInterval);
+                                dismissLoadingSplash();
+                            }
+                        } catch (e) {
+                            clearInterval(checkInterval);
+                            dismissLoadingSplash();
+                        }
+                    }, 200);
+                    // Límite de seguridad: nunca dejar la pantalla bloqueada más de 4 segundos
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        dismissLoadingSplash();
+                    }, 4000);
+                }
+            }).catch(() => dismissLoadingSplash());
+        } else {
+            // En Electron de escritorio o si no hay API async, ocultar de inmediato
+            dismissLoadingSplash();
+        }
 
         // Cargar estilo de voz guardado de personajes (Flubber, Ardillita, Chiquillo)
         const savedCartoonStyle = localStorage.getItem('wikia_cartoon_style') || 'cartoon_flubber';
