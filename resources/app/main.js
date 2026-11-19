@@ -162,10 +162,23 @@ function setupIPC() {
                         // 2. Extraer ilustración principal
                         const imgMatches = html.match(/_assets_\/[^"' \t\r\n<>]+\.(?:jpg|png|webp|svg|jpeg)/gi);
                         if (imgMatches) {
-                            for (const m of imgMatches) {
-                                if (!m.includes('icon') && !m.includes('disambig') && !m.includes('OOjs')) {
-                                    imagePath = m;
-                                    break;
+                            const isFlagQuery = query.toLowerCase().includes('bandera') || item.title.toLowerCase().includes('bandera');
+                            if (isFlagQuery) {
+                                for (const m of imgMatches) {
+                                    const dec = decodeURIComponent(m).toLowerCase();
+                                    if (dec.includes('flag') || dec.includes('bandera')) {
+                                        imagePath = m;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!imagePath) {
+                                for (const m of imgMatches) {
+                                    const dec = decodeURIComponent(m).toLowerCase();
+                                    if (!dec.includes('icon') && !dec.includes('disambig') && !dec.includes('oojs') && !dec.includes('destacado') && !dec.includes('esbozo') && !dec.includes('question_book') && !dec.includes('searchtool')) {
+                                        imagePath = m;
+                                        break;
+                                    }
                                 }
                             }
                         }

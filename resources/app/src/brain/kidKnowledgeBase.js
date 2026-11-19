@@ -84,8 +84,119 @@ export const KID_CURATED_ANSWERS = [
         ],
         title: "La Bandera de Japón",
         answer: "¡La bandera de Japón se llama Hinomaru! Es muy bonita y elegante: tiene un fondo blanco con un gran círculo de color rojo brillante justo en el centro, el cual representa al Sol naciente.",
-        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Earth_Western_Hemisphere.jpg",
-        imageCaption: "La bandera de Japón con el círculo rojo del Sol",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Japan.svg.png",
+        imageCaption: "Bandera oficial de Japón (Hinomaru, el Sol naciente)",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de espa[nñ]a/i,
+            /c[oó]mo es la bandera de espa[nñ]a/i
+        ],
+        title: "La Bandera de España",
+        answer: "¡La bandera de España se conoce como la Rojigualda! Tiene tres franjas horizontales: dos rojas en los extremos y una amarilla en el centro que es el doble de ancha, decorada con el escudo oficial de España.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Spain.svg.png",
+        imageCaption: "Bandera oficial de España",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de m[eé]xico/i,
+            /c[oó]mo es la bandera de m[eé]xico/i
+        ],
+        title: "La Bandera de México",
+        answer: "¡La bandera de México tiene tres hermosos colores: verde de esperanza, blanco de unidad y rojo de alegría! En el centro lleva un águila real sobre un nopal devorando una serpiente, ¡un símbolo legendario fascinante!",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Mexico.svg.png",
+        imageCaption: "Bandera oficial de México con el águila real",
+        mood: "amazed"
+    },
+    {
+        patterns: [
+            /bandera de argentina/i,
+            /c[oó]mo es la bandera de argentina/i
+        ],
+        title: "La Bandera de Argentina",
+        answer: "¡La bandera de Argentina tiene los hermosos colores del cielo y las nubes: celeste y blanco! Justo en el centro brilla el Sol de Mayo con una carita dorada y 32 rayos que representan la libertad.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Argentina.svg.png",
+        imageCaption: "Bandera oficial de Argentina con el Sol de Mayo",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de colombia/i,
+            /c[oó]mo es la bandera de colombia/i
+        ],
+        title: "La Bandera de Colombia",
+        answer: "¡La bandera de Colombia tiene tres alegres colores: amarillo que representa sus riquezas y el Sol, azul de sus dos océanos y cielo, y rojo por la fuerza y el amor de su gente!",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Colombia.svg.png",
+        imageCaption: "Bandera oficial de Colombia",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de chile/i,
+            /c[oó]mo es la bandera de chile/i
+        ],
+        title: "La Bandera de Chile",
+        answer: "¡La bandera de Chile se llama la Estrella Solitaria! Tiene dos franjas, azul y blanca arriba con una estrella blanca de cinco puntas, y una franja roja brillante abajo que representa la fuerza y el valor.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Chile.svg.png",
+        imageCaption: "Bandera oficial de Chile",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de per[uú]/i,
+            /c[oó]mo es la bandera de per[uú]/i
+        ],
+        title: "La Bandera del Perú",
+        answer: "¡La bandera del Perú tiene tres franjas verticales: dos rojas en los laterales y una blanca en el centro! Representa la paz, la pureza y el corazón de su gran historia andina.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/War_flag_of_Peru.svg.png",
+        imageCaption: "Bandera oficial del Perú",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de francia/i,
+            /c[oó]mo es la bandera de francia/i
+        ],
+        title: "La Bandera de Francia",
+        answer: "¡La bandera de Francia es la famosa Tricolor! Está formada por tres franjas verticales iguales de color azul, blanco y rojo, que representan la libertad, la igualdad y la fraternidad entre amigos.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_France.svg.png",
+        imageCaption: "Bandera oficial de Francia",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de italia/i,
+            /c[oó]mo es la bandera de italia/i
+        ],
+        title: "La Bandera de Italia",
+        answer: "¡La bandera de Italia tiene tres franjas verticales: verde como sus hermosos campos, blanco como la nieve de los Alpes y rojo por el entusiasmo de su gente!",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Italy.svg.png",
+        imageCaption: "Bandera oficial de Italia",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /bandera de brasil/i,
+            /c[oó]mo es la bandera de brasil/i
+        ],
+        title: "La Bandera de Brasil",
+        answer: "¡La bandera de Brasil es una de las más vistosas del mundo! Tiene fondo verde de la selva amazónica, un gran rombo amarillo de su alegría y un círculo azul con constelaciones de estrellas que representan sus estados.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Brazil.svg.png",
+        imageCaption: "Bandera oficial de Brasil",
+        mood: "amazed"
+    },
+    {
+        patterns: [
+            /bandera de estados unidos/i,
+            /bandera de eeuu/i,
+            /c[oó]mo es la bandera de estados unidos/i
+        ],
+        title: "La Bandera de Estados Unidos",
+        answer: "¡La bandera de Estados Unidos tiene 50 estrellas blancas que representan sus 50 estados, y 13 franjas rojas y blancas por sus primeras colonias! Se la conoce con cariño como las Barras y Estrellas.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_the_United_States.svg.png",
+        imageCaption: "Bandera oficial de Estados Unidos",
         mood: "happy"
     },
     {
@@ -95,8 +206,8 @@ export const KID_CURATED_ANSWERS = [
             /ver banderas/i
         ],
         title: "Las Banderas del Mundo",
-        answer: "¡Las banderas son símbolos coloridos y mágicos que representan a cada país y a su gente! Cada bandera tiene colores, estrellas o escudos con historias únicas. ¡Dime el nombre de cualquier país y te contaré cómo es su bandera!",
-        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Earth_Western_Hemisphere.jpg",
+        answer: "¡En nuestro planeta hay casi 200 países y cada uno tiene su propia bandera llena de color e historia! Pregúntame por la bandera de cualquier país (como Japón, España, México, Argentina, Francia, Colombia, Chile, Perú o Brasil) y te mostraré su bandera oficial.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Flag_of_Spain.svg.png",
         imageCaption: "Banderas que representan a los países del mundo",
         mood: "curious"
     },
