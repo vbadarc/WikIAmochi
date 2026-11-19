@@ -1,45 +1,84 @@
-# Declaración de Seguridad de los Datos (Google Play Data Safety) — WikIAmochi
+# Respuestas Oficiales para el Formulario de Seguridad de los Datos (Data Safety) en Google Play Console
 
 **Aplicación:** WikIAmochi (`com.wikiamochi.app`)  
+**Versión:** 1.0.0  
 **Desarrollador:** VicThor Dev  
-**Público objetivo:** Familias y niños (Cumplimiento de Google Play Families Policy, COPPA y RGPD-K)  
-**Fecha de elaboración:** 18 de noviembre de 2026  
-**Estado:** Decisión de diseño confirmada por el desarrollador.
+**Fecha:** Noviembre 2026  
+
+Este documento recoge las respuestas exactas, campo por campo, que deben marcarse en la sección **Seguridad de los datos** de Google Play Console, basadas estrictamente en la auditoría del código fuente y el comportamiento de la app en Android.
 
 ---
 
-## 1. Resumen Ejecutivo de Recogida y Uso de Datos
+## 1. Recopilación y Seguridad de Datos
 
-| Pregunta de Google Play Console | Respuesta Oficial | Justificación Técnica y Legal |
-| :--- | :--- | :--- |
-| **¿La aplicación recoge o comparte algún tipo de dato de usuario?** | **SÍ (con restricciones estrictas para familias)** | Solo se procesa voz efímera si un adulto la activa expresamente. |
-| **¿Todos los datos que recoge la aplicación se cifran en tránsito?** | **SÍ** | Cualquier petición HTTP externa (solo cuando un adulto activa el modo online o el servicio de transcripción de Google) utiliza TLS/HTTPS. |
-| **¿La app está sujeta a las Políticas de Familias de Google Play?** | **SÍ** | La aplicación está diseñada específicamente para niños, no incluye publicidad, no contiene compras integradas (IAP) y no utiliza SDKs de analítica o rastreo. |
-| **¿Permite a los usuarios solicitar la eliminación de datos?** | **SÍ** | Todos los datos locales (conceptos aprendidos, configuración, PIN) se borran al desinstalar la app o al pulsar "Borrar datos" en Ajustes de Android. |
+### ¿Tu aplicación recopila o comparte alguno de los tipos de datos de usuario obligatorios?
+- **Respuesta:** **SÍ**.
+- *Nota técnica:* Aunque WikIAmochi no recopila datos para sus propios servidores, la delegación del reconocimiento de voz en el servicio del sistema Android (`SpeechRecognizer` de Google) puede implicar la transmisión de clips de audio para su procesamiento por parte de Google si el dispositivo carece de paquetes offline.
 
----
+### ¿Se cifran en tránsito todos los datos de usuario que recopila tu aplicación?
+- **Respuesta:** **SÍ**.
+- *Explicación:* Tanto las conexiones HTTPS con Vikidia (cuando se activa el modo online) como las conexiones seguras de Google Speech Services utilizan TLS/HTTPS cifrado en tránsito.
 
-## 2. Sección Detallada de Audio y Micrófono
-
-### 2.1 Política y Decisión de Activación
-* **Estado predeterminado:** **DESACTIVADO POR DEFECTO.**
-* **Requisito de control parental:** El botón del micrófono permanece bloqueado (con candado visual `🔒`). El niño **no puede activar el micrófono por sí mismo**.
-* **Acción exclusiva del adulto:** Solo un adulto (padre, madre o tutor) puede activar el reconocimiento de voz desde la Zona de Familias tras superar la puerta parental protegida por PIN.
-* **Permiso del sistema:** El permiso `android.permission.RECORD_AUDIO` **nunca se solicita al sistema operativo en el primer inicio de la app**, sino única y exclusivamente en el instante en que el adulto decide activarlo en el panel de Ajustes.
-* **Derecho de revocación:** El adulto puede desactivar el micrófono en cualquier momento desde los Ajustes, volviendo inmediatamente el botón al estado de bloqueo y cancelando cualquier proceso de escucha activo.
-
-### 2.2 Tratamiento del Audio y Flujo de Red
-* **Grabaciones persistentes:** **NO SE GRABAN NI SE GUARDAN AUDIOS.** WikIAmochi no almacena archivos de audio ni en el almacenamiento local ni en servidores propios.
-* **Procesamiento de voz:**
-  * La aplicación utiliza la API oficial de Android `android.speech.SpeechRecognizer` a través del plugin `@capacitor-community/speech-recognition`.
-  * **En dispositivos con reconocimiento en el dispositivo:** Si el dispositivo Android cuenta con el modelo de voz sin conexión instalado (`SpeechRecognizer.isOnDeviceRecognitionAvailable() == true`), el audio se procesa 100% de forma local y **ningún byte de audio sale del terminal**.
-  * **En dispositivos que requieren servicio de red:** Si el motor de Android no cuenta con modelo local, la transcripción a texto es delegada en el servicio oficial de voz de Google. El texto transcrito resultante se inserta en el campo de búsqueda de la enciclopedia.
-* **Fines de uso:** Estrictamente **Funcionalidad de la aplicación** (permitir al niño formular su pregunta mediante la voz en lugar del teclado).
+### ¿Ofreces a los usuarios una forma de solicitar que se eliminen sus datos?
+- **Respuesta:** **SÍ**.
+- *Mecanismo:* La aplicación incluye en los ajustes de adultos el botón directo "🗑️ Borrar todos los datos de la app" que restablece la memoria, preferencias y PIN. Además, los usuarios pueden solicitar asistencia directa por correo a `vjbadenassepe@gmail.com`.
 
 ---
 
-## 3. Inventario de Permisos Declarados en `AndroidManifest.xml`
+## 2. Tipos de Datos Específicos
 
-1. `android.permission.INTERNET`: Requerido por el WebView local (`https://localhost/`) y para el modo online supervisado opcional (consultas a Vikidia).
-2. `android.permission.RECORD_AUDIO`: **ÚNICO PERMISO SENSIBLE.** Apagado por defecto y controlado bajo puerta parental para transcripción efímera de voz a texto.
-3. **Ausencia total de otros permisos sensibles:** No se solicita acceso a ubicación, cámara, contactos, almacenamiento externo compartido ni identificadores de publicidad (AAID).
+### Categoría: Audio (Voz o grabaciones de sonido)
+- **¿Se recopilan datos de audio?** **SÍ** (a través de `android.permission.RECORD_AUDIO` al pulsar el botón del micrófono).
+- **¿Se comparten datos de audio?** **SÍ** (se transmiten a los Servicios de Voz de Google para la transcripción texto-a-voz en caso de procesamiento en la nube).
+- **¿Es obligatoria la recopilación de audio o los usuarios pueden decidir si se recopila?**
+  - **Los usuarios pueden decidir si se recopila:** Los usuarios pueden utilizar la app escribiendo sus preguntas con el teclado sin necesidad de usar el micrófono jamás.
+- **Finalidades de la recopilación de audio:**
+  - **Funcionalidad de la aplicación:** Permitir a los niños hacer preguntas hablando.
+
+### Categoría: Ubicación
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Información personal (Nombre, email, dirección, teléfono)
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Información financiera
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Salud y actividad física
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Mensajes
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Fotos y vídeos
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Archivos y documentos
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Calendario
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Contactos
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Actividad en aplicaciones (Páginas vistas, toques, interacciones)
+- **¿Se recopila o comparte?** **NO** (no hay analíticas de terceros ni Firebase).
+
+### Categoría: Navegación web
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Información y rendimiento de la app (Registros de fallos, diagnósticos)
+- **¿Se recopila o comparte?** **NO**.
+
+### Categoría: Identificadores de dispositivo u otros IDs
+- **¿Se recopila o comparte?** **NO** (la app no utiliza `AD_ID` ni genera GUIDs persistentes para rastreo).
+
+---
+
+## 3. Prácticas de Privacidad para Menores y Familias
+
+- **¿La aplicación se adhiere a la Política de Familias de Google Play?** **SÍ**.
+- **¿La aplicación incluye SDKs de anuncios no aprobados para Familias?** **NO** (cero SDKs de anuncios).
+- **Enlace a la Política de Privacidad:**  
+  `https://vbadarc.github.io/WikIAmochi/politica-privacidad.html`
