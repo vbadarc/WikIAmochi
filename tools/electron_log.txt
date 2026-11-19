@@ -1,0 +1,1 @@
+WikIAmochi.exe: bad option: --enable-logging

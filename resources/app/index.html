@@ -1056,7 +1056,7 @@
 
         <!-- Modal de Seguridad Parental y Ajustes de Familia (Solo Adultos) -->
         <div class="parental-modal-overlay" id="pinSecurityModal">
-            <div class="modal-card" style="max-width: 360px;">
+            <div class="modal-card" style="max-width: 380px;">
                 <div style="font-size: 34px; margin-bottom: 4px;">🔐</div>
                 <h3 class="modal-title" id="pinModalTitle">Zona de Familias y Ajustes</h3>
                 <p class="modal-desc" id="pinModalDesc">Control exclusivo para adultos (padres o tutores):</p>
@@ -1066,19 +1066,60 @@
                     <div id="pinModeDisplay" style="background: #F1F8E9; border-radius: 14px; padding: 10px; margin-bottom: 12px; text-align: center;">
                         <div style="font-size: 11px; font-weight: 700; color: #546E7A; text-transform: uppercase;">Modo de la Enciclopedia</div>
                         <div id="pinCurrentModeLabel" style="font-size: 13px; font-weight: 700; color: #2E7D32; margin-top: 2px;">🟢 WikIAmochi 100% Offline</div>
+                        <div style="font-size: 10px; color: #78909C; margin-top: 2px;">(El Modo Online consulta exclusivamente la enciclopedia infantil Vikidia)</div>
                     </div>
 
                     <div id="pinInputSection" style="margin-bottom: 12px;">
-                        <div style="font-size: 11px; font-weight: 700; color: #546E7A; margin-bottom: 4px; text-align: center;">Introduce tu PIN de 4 números para guardar cambios:</div>
+                        <div id="pinPromptText" style="font-size: 11px; font-weight: 700; color: #546E7A; margin-bottom: 4px; text-align: center;">Introduce tu PIN de 4 números de adulto:</div>
                         <input type="password" id="inputPinCode" maxlength="4" placeholder="••••" inputmode="numeric" style="width: 140px; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 6px; padding: 6px 10px; border-radius: 14px; border: 2px solid #00B0FF; outline: none; background: white; margin: 0 auto; display: block;">
                         <p id="pinFeedback" style="font-size: 11px; margin-top: 4px; font-weight: 700; min-height: 16px; text-align: center;"></p>
+                        <div style="text-align: center; margin-top: 4px;">
+                            <button id="btnForgotPin" type="button" style="background: none; border: none; font-size: 11px; color: #0277BD; text-decoration: underline; cursor: pointer; font-family: inherit;">¿Olvidaste tu PIN? (Reto para adultos)</button>
+                        </div>
+                    </div>
+
+                    <!-- Reto matemático de recuperación de PIN para adultos -->
+                    <div id="mathChallengeBox" style="display: none; background: #FFF8E1; border: 1px dashed #FFB300; border-radius: 12px; padding: 10px; margin-bottom: 12px; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: #E65100; margin-bottom: 4px;">Reto de recuperación para adultos:</div>
+                        <div id="mathChallengeQuestion" style="font-size: 15px; font-weight: 800; color: #D84315; margin-bottom: 6px;"></div>
+                        <input type="number" id="inputMathAnswer" placeholder="Resultado" style="width: 100px; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 16px; font-weight: 700; padding: 4px 8px; border-radius: 8px; border: 1px solid #FFB300; outline: none; margin-bottom: 6px;">
+                        <div style="display: flex; gap: 6px; justify-content: center;">
+                            <button id="btnVerifyMathChallenge" type="button" style="padding: 4px 10px; background: #FF9800; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer;">Verificar y Restablecer PIN</button>
+                            <button id="btnCancelMathChallenge" type="button" style="padding: 4px 8px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-size: 11px; cursor: pointer;">Cancelar</button>
+                        </div>
+                    </div>
+
+                    <!-- Panel de acciones de adulto autenticado -->
+                    <div id="parentActionsPanel" style="display: none; border-top: 1px solid #CFD8DC; padding-top: 10px; margin-top: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn-modal primary" id="btnToggleOnlineModeAuth" style="font-size: 12px; padding: 8px 12px;">🌐 Alternar Modo Online (Vikidia)</button>
+                            <button class="btn-modal" id="btnShowLicenses" style="font-size: 12px; padding: 8px 12px; background: #ECEFF1; color: #37474F;">📜 Acerca de y Licencias (GPLv3 / CC BY-SA)</button>
+                            <button class="btn-modal" id="btnResetAllData" style="font-size: 12px; padding: 8px 12px; background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2;">🗑️ Borrar todos los datos de la app</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="modal-buttons" style="flex-direction: column; gap: 8px;">
-                    <button class="btn-modal primary" id="btnToggleModeConfirm">Guardar y Aplicar Ajustes</button>
-                    <button class="btn-modal secondary" id="btnDisablePin" style="font-size: 12px; padding: 8px; color: #D32F2F;">🔓 Quitar protección por PIN</button>
+                <div class="modal-buttons" style="flex-direction: column; gap: 8px; margin-top: 10px;">
+                    <button class="btn-modal primary" id="btnToggleModeConfirm">Entrar a Ajustes de Adultos</button>
                     <button class="btn-modal secondary" id="btnClosePinModal" style="font-size: 12px; padding: 8px;">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Licencias y Créditos Legales -->
+        <div class="parental-modal-overlay" id="licensesModal" style="display: none;">
+            <div class="modal-card" style="max-width: 440px; text-align: left;">
+                <h3 class="modal-title" style="text-align: center; margin-bottom: 8px;">📜 Acerca de y Licencias</h3>
+                <div class="modal-body-scroll" style="max-height: 55vh; font-size: 11px; line-height: 1.5; color: #37474F;">
+                    <p><strong>WikIAmochi</strong> versión 1.0.0 (VicThor Dev)<br>Enciclopedia inteligente infantil sin publicidad.</p>
+                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ECEFF1;">
+                    <p><strong>Licencia de la Aplicación:</strong><br>Distribuida bajo licencia GNU General Public License v3 (GPLv3).</p>
+                    <p><strong>Contenido Enciclopédico:</strong><br>Textos e ilustraciones infantiles procedentes de <em>Vikidia en español</em>, bajo licencia Creative Commons Atribución-CompartirIgual 3.0 (CC BY-SA 3.0) y Wikimedia Commons.</p>
+                    <p><strong>Motor Lector ZIM:</strong><br>Basado en <em>libzim</em> y <em>Kiwix</em> (GPLv3 / LGPLv3).</p>
+                    <p><strong>Política de Privacidad:</strong><br>Disponible en: <a href="https://vbadarc.github.io/WikIAmochi/politica-privacidad.html" target="_blank" style="color: #0277BD;">vbadarc.github.io/WikIAmochi/politica-privacidad.html</a></p>
+                </div>
+                <div class="modal-buttons" style="margin-top: 10px;">
+                    <button class="btn-modal primary" id="btnCloseLicensesModal">Entendido</button>
                 </div>
             </div>
         </div>
@@ -1158,7 +1199,7 @@
         voiceService.setCartoonTone(savedCartoonStyle);
 
         // Control del Modo Offline y Protección por PIN (Opcional, desactivado por defecto)
-        let isOfflineOnly = localStorage.getItem('gloop_offline_only') === 'true';
+        let isOfflineOnly = localStorage.getItem('gloop_offline_only') !== 'false'; // 100% Offline por defecto
         let pinEnabled = localStorage.getItem('gloop_pin_enabled') === 'true';
         let parentPin = localStorage.getItem('gloop_parent_pin') || '';
         let activeQueryId = 0; // Token de turno para evitar solapamiento de respuestas y voces
@@ -1400,6 +1441,14 @@
         });
 
         // 2. Clic en el engranaje para abrir/cerrar ajustes finos
+                // Engranaje de calibración de voz: solo activo en modo debug
+        const isDebugMode = window.location.search.includes('debug=1') || localStorage.getItem('wikia_debug_mode') === 'true';
+        if (!isDebugMode) {
+            document.querySelectorAll('.btn-voice-gear, .voice-gear-panel').forEach(el => {
+                el.style.setProperty('display', 'none', 'important');
+            });
+        }
+
         document.querySelectorAll('.btn-voice-gear').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1989,10 +2038,24 @@
             }
         });
 
-        // Cancelar escucha si la app pasa a segundo plano o se apaga la pantalla
+        // Ciclo de vida: Pausar canvas, audio, TTS y micrófono al bloquear pantalla o cambiar de app
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden && micState === 'listening') {
-                cancelListening();
+            if (document.hidden) {
+                if (avatar && typeof avatar.stop === 'function') {
+                    avatar.stop();
+                }
+                if (micState === 'listening') {
+                    cancelListening();
+                }
+                if (voiceService && typeof voiceService.stopSpeaking === 'function') {
+                    voiceService.stopSpeaking();
+                } else if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+            } else {
+                if (avatar && typeof avatar.start === 'function') {
+                    avatar.start();
+                }
             }
         });
 
@@ -2033,67 +2096,99 @@
             voiceModal.style.display = 'none';
         });
 
-        // Control del Modo Offline Directo y Protección por PIN (Totalmente Opcional)
+        // Control de Seguridad Parental y Zona de Familias
         const pinSecurityModal = document.getElementById('pinSecurityModal');
         const btnToggleModeConfirm = document.getElementById('btnToggleModeConfirm');
-        const btnDisablePin = document.getElementById('btnDisablePin');
         const btnClosePinModal = document.getElementById('btnClosePinModal');
         const inputPinCode = document.getElementById('inputPinCode');
         const pinFeedback = document.getElementById('pinFeedback');
         const pinCurrentModeLabel = document.getElementById('pinCurrentModeLabel');
+        const pinPromptText = document.getElementById('pinPromptText');
+        const parentActionsPanel = document.getElementById('parentActionsPanel');
+        const btnToggleOnlineModeAuth = document.getElementById('btnToggleOnlineModeAuth');
+        const btnShowLicenses = document.getElementById('btnShowLicenses');
+        const btnResetAllData = document.getElementById('btnResetAllData');
+        const btnForgotPin = document.getElementById('btnForgotPin');
+        const mathChallengeBox = document.getElementById('mathChallengeBox');
+        const mathChallengeQuestion = document.getElementById('mathChallengeQuestion');
+        const inputMathAnswer = document.getElementById('inputMathAnswer');
+        const btnVerifyMathChallenge = document.getElementById('btnVerifyMathChallenge');
+        const btnCancelMathChallenge = document.getElementById('btnCancelMathChallenge');
+        const licensesModal = document.getElementById('licensesModal');
+        const btnCloseLicensesModal = document.getElementById('btnCloseLicensesModal');
 
-        function toggleOfflineModeDirect() {
-            isOfflineOnly = !isOfflineOnly;
-            localStorage.setItem('gloop_offline_only', isOfflineOnly ? 'true' : 'false');
-            updateModeUI();
-            playCuteChime();
+        let mathExpectedAnswer = null;
+
+        function updateParentModalUI() {
             if (isOfflineOnly) {
-                speak('¡Modo WikIAmochi 100% Offline activado! Ahora solo responderé con la enciclopedia guardada.', 'curated');
+                pinCurrentModeLabel.textContent = '🟢 WikIAmochi 100% Offline';
+                pinCurrentModeLabel.style.color = '#2E7D32';
+                btnToggleOnlineModeAuth.textContent = '🌐 Cambiar a Modo Online (Solo Vikidia)';
             } else {
-                speak('¡Modo Online Híbrido activado con supervisión! Podré aprender cositas seguras de internet.', 'curated');
+                pinCurrentModeLabel.textContent = '🌐 Modo Online Híbrido (Vikidia)';
+                pinCurrentModeLabel.style.color = '#0277BD';
+                btnToggleOnlineModeAuth.textContent = '🟢 Cambiar a Modo 100% Offline';
+            }
+
+            if (!parentPin) {
+                pinPromptText.textContent = 'Crea tu PIN de 4 números para la Zona de Adultos:';
+                btnToggleModeConfirm.textContent = 'Crear PIN y Acceder';
+                btnForgotPin.style.display = 'none';
+            } else {
+                pinPromptText.textContent = 'Introduce tu PIN de 4 números de adulto:';
+                btnToggleModeConfirm.textContent = 'Desbloquear Zona de Adultos';
+                btnForgotPin.style.display = 'inline-block';
             }
         }
 
         function openPinModal() {
             inputPinCode.value = '';
             pinFeedback.textContent = '';
-            if (isOfflineOnly) {
-                pinCurrentModeLabel.textContent = '🟢 WikIAmochi 100% Offline';
-                pinCurrentModeLabel.style.color = '#2E7D32';
-                btnToggleModeConfirm.textContent = '🌐 Desbloquear y Cambiar a Online';
-            } else {
-                pinCurrentModeLabel.textContent = '🌐 Modo Online Híbrido';
-                pinCurrentModeLabel.style.color = '#0277BD';
-                btnToggleModeConfirm.textContent = '🟢 Cambiar a Modo 100% Offline';
-            }
+            mathChallengeBox.style.display = 'none';
+            parentActionsPanel.style.display = 'none';
+            document.getElementById('pinInputSection').style.display = 'block';
+            btnToggleModeConfirm.style.display = 'block';
+            updateParentModalUI();
             pinSecurityModal.style.display = 'flex';
             setTimeout(() => inputPinCode.focus(), 150);
         }
 
         function closePinModal() {
             pinSecurityModal.style.display = 'none';
+            mathChallengeBox.style.display = 'none';
+            parentActionsPanel.style.display = 'none';
         }
 
-        // 1. Pulsador superior: conmuta directamente al instante si no hay PIN configurado
-        btnToggleOffline.addEventListener('click', () => {
-            if (!pinEnabled) {
-                // Sin PIN: conmutación libre inmediata
-                toggleOfflineModeDirect();
-            } else {
-                // Con PIN activo: solo se exige el PIN para pasar a Online
-                if (isOfflineOnly) {
-                    openPinModal();
-                } else {
-                    toggleOfflineModeDirect();
-                }
-            }
-        });
-
+        // Abrir puerta parental al pulsar el botón de modo offline o el candado
+        btnToggleOffline.addEventListener('click', openPinModal);
+        if (btnPinLock) {
+            btnPinLock.addEventListener('click', openPinModal);
+        }
         btnClosePinModal.addEventListener('click', closePinModal);
 
+        // Validación o Creación de PIN
         btnToggleModeConfirm.addEventListener('click', async () => {
             const entered = inputPinCode.value.trim();
-            if (pinEnabled && entered !== parentPin) {
+            if (!/^d{4}$/.test(entered)) {
+                pinFeedback.style.color = '#D32F2F';
+                pinFeedback.textContent = 'El PIN debe ser exactamente de 4 números.';
+                inputPinCode.focus();
+                return;
+            }
+
+            if (!parentPin) {
+                // Creación de PIN por primera vez
+                parentPin = entered;
+                pinEnabled = true;
+                localStorage.setItem('gloop_parent_pin', parentPin);
+                localStorage.setItem('gloop_pin_enabled', 'true');
+                if (window.Capacitor?.Plugins?.Preferences) {
+                    await window.Capacitor.Plugins.Preferences.set({ key: 'gloop_parent_pin', value: parentPin });
+                    await window.Capacitor.Plugins.Preferences.set({ key: 'gloop_pin_enabled', value: 'true' });
+                }
+                pinFeedback.style.color = '#2E7D32';
+                pinFeedback.textContent = '✓ PIN creado con éxito.';
+            } else if (entered !== parentPin) {
                 pinFeedback.style.color = '#D32F2F';
                 pinFeedback.textContent = '✗ PIN incorrecto.';
                 inputPinCode.value = '';
@@ -2101,8 +2196,11 @@
                 return;
             }
 
-            closePinModal();
-            toggleOfflineModeDirect();
+            // Desbloqueo exitoso de la Zona de Adultos
+            document.getElementById('pinInputSection').style.display = 'none';
+            btnToggleModeConfirm.style.display = 'none';
+            parentActionsPanel.style.display = 'block';
+            pinFeedback.textContent = '';
         });
 
         inputPinCode.addEventListener('keydown', (e) => {
@@ -2111,72 +2209,93 @@
             }
         });
 
-        // 2. Desactivar PIN desde el propio modal
-        if (btnDisablePin) {
-            btnDisablePin.addEventListener('click', () => {
-                const entered = inputPinCode.value.trim();
-                if (entered !== parentPin) {
-                    pinFeedback.style.color = '#D32F2F';
-                    pinFeedback.textContent = '✗ Introduce tu PIN actual arriba para poder desactivarlo.';
-                    inputPinCode.focus();
-                    return;
-                }
-                pinEnabled = false;
+        // Alternar modo online desde la zona de adultos
+        btnToggleOnlineModeAuth.addEventListener('click', async () => {
+            isOfflineOnly = !isOfflineOnly;
+            localStorage.setItem('gloop_offline_only', isOfflineOnly ? 'true' : 'false');
+            if (window.Capacitor?.Plugins?.Preferences) {
+                await window.Capacitor.Plugins.Preferences.set({
+                    key: 'gloop_offline_only',
+                    value: isOfflineOnly ? 'true' : 'false'
+                });
+            }
+            updateModeUI();
+            updateParentModalUI();
+            playCuteChime();
+            if (isOfflineOnly) {
+                speak('¡Modo WikIAmochi 100% Offline activado!', 'curated');
+            } else {
+                speak('¡Modo Online Vikidia activado con supervisión!', 'curated');
+            }
+        });
+
+        // Reto de recuperación para adultos (multiplicación de dos cifras)
+        btnForgotPin.addEventListener('click', () => {
+            const num1 = Math.floor(Math.random() * 40) + 15; // 15 a 54
+            const num2 = Math.floor(Math.random() * 20) + 12; // 12 a 31
+            mathExpectedAnswer = num1 * num2;
+            mathChallengeQuestion.textContent = `¿Cuánto es ${num1} × ${num2}?`;
+            inputMathAnswer.value = '';
+            mathChallengeBox.style.display = 'block';
+            document.getElementById('pinInputSection').style.display = 'none';
+            btnToggleModeConfirm.style.display = 'none';
+            inputMathAnswer.focus();
+        });
+
+        btnCancelMathChallenge.addEventListener('click', () => {
+            mathChallengeBox.style.display = 'none';
+            document.getElementById('pinInputSection').style.display = 'block';
+            btnToggleModeConfirm.style.display = 'block';
+        });
+
+        btnVerifyMathChallenge.addEventListener('click', async () => {
+            const val = parseInt(inputMathAnswer.value.trim(), 10);
+            if (val === mathExpectedAnswer) {
                 parentPin = '';
+                pinEnabled = false;
                 localStorage.removeItem('gloop_parent_pin');
                 localStorage.setItem('gloop_pin_enabled', 'false');
-                updateModeUI();
-                closePinModal();
-                alert('✓ PIN desactivado. El botón de arriba ahora cambia de modo directamente sin pedir nada.');
-            });
-        }
-
-        // 3. Botón de Candado en la barra superior para activar o gestionar el PIN opcional
-        if (btnPinLock) {
-            btnPinLock.addEventListener('click', () => {
-                if (!pinEnabled) {
-                    const wantPin = confirm('¿Deseas activar un PIN de 4 números para proteger el cambio a Modo Online? (Es totalmente opcional)');
-                    if (!wantPin) return;
-                    const newPin = prompt('Introduce tu nuevo PIN de 4 números (ej: 1234):');
-                    if (!newPin) return;
-                    if (!/^\d{4}$/.test(newPin.trim())) {
-                        alert('El PIN debe tener exactamente 4 dígitos numéricos.');
-                        return;
-                    }
-                    parentPin = newPin.trim();
-                    pinEnabled = true;
-                    localStorage.setItem('gloop_parent_pin', parentPin);
-                    localStorage.setItem('gloop_pin_enabled', 'true');
-                    updateModeUI();
-                    alert('✓ ¡PIN de seguridad activado! Ahora estará protegido con candado 🔒.');
-                } else {
-                    const entered = prompt('Introduce tu PIN actual para gestionar la seguridad:');
-                    if (entered === null) return;
-                    if (entered.trim() !== parentPin) {
-                        alert('El PIN no es correcto.');
-                        return;
-                    }
-                    const action = confirm('Pulsa ACEPTAR para DESACTIVAR el PIN (dejarlo libre) o CANCELAR para cambiar el PIN.');
-                    if (action) {
-                        pinEnabled = false;
-                        parentPin = '';
-                        localStorage.removeItem('gloop_parent_pin');
-                        localStorage.setItem('gloop_pin_enabled', 'false');
-                        updateModeUI();
-                        alert('✓ PIN desactivado con éxito. El modo ahora es libre.');
-                    } else {
-                        const newPin = prompt('Introduce el nuevo PIN de 4 números:');
-                        if (!newPin || !/^\d{4}$/.test(newPin.trim())) {
-                            alert('El PIN debe tener exactamente 4 dígitos numéricos.');
-                            return;
-                        }
-                        parentPin = newPin.trim();
-                        localStorage.setItem('gloop_parent_pin', parentPin);
-                        alert('✓ ¡PIN actualizado correctamente!');
-                    }
+                if (window.Capacitor?.Plugins?.Preferences) {
+                    await window.Capacitor.Plugins.Preferences.remove({ key: 'gloop_parent_pin' });
+                    await window.Capacitor.Plugins.Preferences.set({ key: 'gloop_pin_enabled', value: 'false' });
                 }
-            });
-        }
+                alert('✓ Reto superado. Tu PIN anterior ha sido restablecido. Puedes crear uno nuevo ahora.');
+                mathChallengeBox.style.display = 'none';
+                document.getElementById('pinInputSection').style.display = 'block';
+                btnToggleModeConfirm.style.display = 'block';
+                updateParentModalUI();
+            } else {
+                alert('✗ Resultado incorrecto. Inténtalo de nuevo.');
+                inputMathAnswer.value = '';
+                inputMathAnswer.focus();
+            }
+        });
+
+        // Ver licencias desde la zona parental
+        btnShowLicenses.addEventListener('click', () => {
+            licensesModal.style.display = 'flex';
+        });
+        btnCloseLicensesModal.addEventListener('click', () => {
+            licensesModal.style.display = 'none';
+        });
+
+        // Borrar todos los datos de la app (memoria, preferencias, PIN)
+        btnResetAllData.addEventListener('click', async () => {
+            const confirmed = confirm('¿Estás seguro de que deseas borrar todos los datos, memoria y preferencias de WikIAmochi? La aplicación se reiniciará por completo.');
+            if (!confirmed) return;
+
+            localStorage.clear();
+            if (window.Capacitor?.Plugins?.Preferences) {
+                try {
+                    await window.Capacitor.Plugins.Preferences.clear();
+                } catch (e) {
+                    console.warn('Error al limpiar Capacitor Preferences:', e);
+                }
+            }
+            alert('✓ Todos los datos han sido eliminados correctamente.');
+            window.location.reload();
+        });
+
     </script>
 </body>
 </html>

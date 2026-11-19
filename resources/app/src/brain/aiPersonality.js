@@ -13,20 +13,45 @@ export class GloopPersonality {
             'drogas', 'cocaina', 'heroina', 'marihuana', 'muerte violenta', 'terrorismo',
             'contenido adulto', 'sexo', 'sexual', 'pornografia', 'erotico', 'desnudo',
             'apuestas', 'casino', 'odio', 'matar', 'suicidio', 'sangre',
-            'tortura', 'secuestro', 'veneno mortal', 'narco'
+            'tortura', 'secuestro', 'veneno mortal', 'narco', 'pelear', 'golpear', 'guerra'
+        ];
+        this.distressTopics = [
+            'hacerme daño', 'hacerse daño', 'quiero morir', 'quiero morirme', 'no quiero vivir',
+            'me quiero matar', 'estoy muy triste', 'nadie me quiere', 'me siento solo',
+            'me pegan', 'me hacen daño', 'tengo mucho miedo'
         ];
     }
 
     /**
      * Valida que la pregunta del niño sea 100% segura
      */
+    _normalize(str) {
+        if (!str) return '';
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
     isContentSafe(query) {
         if (!query) return true;
-        const lower = query.toLowerCase();
+        const norm = this._normalize(query);
         for (const blocked of this.blockedTopics) {
-            if (lower.includes(blocked)) return false;
+            if (norm.includes(this._normalize(blocked))) return false;
+        }
+        for (const distress of this.distressTopics) {
+            if (norm.includes(this._normalize(distress))) return false;
         }
         return true;
+    }
+
+    /**
+     * Comprueba si la consulta refleja malestar o necesidad de ayuda
+     */
+    isDistressQuery(query) {
+        if (!query) return false;
+        const norm = this._normalize(query);
+        for (const distress of this.distressTopics) {
+            if (norm.includes(this._normalize(distress))) return true;
+        }
+        return false;
     }
 
     /**
@@ -127,7 +152,16 @@ export class GloopPersonality {
         };
     }
 
-    getSafeFallbackResponse() {
+    getSafeFallbackResponse(query = '') {
+        if (this.isDistressQuery(query)) {
+            return {
+                mood: 'comforting',
+                speechText: '¡Gloop! Eres muy valioso y especial. Cuando nos sentimos tristes, asustados o con ganas de hacernos daño, lo más importante es hablar con papá, mamá o un adulto de confianza que te quiere. ¡No estás solo y ellos te van a escuchar y cuidar con mucho amor!',
+                expression: 'tender',
+                isBlocked: true,
+                isDistress: true
+            };
+        }
         return {
             mood: 'thinking',
             speechText: '¡Gloop! Ese tema puede ser un poco confuso o complicado para nosotros. ¿Por qué no exploramos algo asombroso como el mar o los inventos geniales?',

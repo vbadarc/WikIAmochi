@@ -71,13 +71,8 @@ export class OnlineLearner {
         }
 
         try {
-            // Intentar primero en la enciclopedia infantil Vikidia
+            // Modo Online restringido exclusivamente a la enciclopedia infantil oficial Vikidia
             let result = await this.fetchFromVikidia(cleanQuery);
-
-            // Si Vikidia no lo tiene, consultar el extracto seguro de Wikipedia
-            if (!result) {
-                result = await this.fetchFromWikipedia(cleanQuery);
-            }
 
             if (!result || !result.snippet) return null;
 
