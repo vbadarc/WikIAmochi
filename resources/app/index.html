@@ -1605,21 +1605,77 @@
             }
 
             // 3. Normalizar términos y extraer el concepto clave
-            let cleanKey = query.toLowerCase().replace(/[?¿!¡,.]/g, ' ').replace(/\s+/g, ' ').trim();
-            // Quitar fórmulas interrogativas típicas
-            cleanKey = cleanKey
-                .replace(/^(?:que|qué|quien|quién|como|cómo|donde|dónde|por\s+que|por\s+qué|cuanto|cuánto|cuantos|cuántos)\s+(?:es|era|son|eran|fue|fueron|significa|quiere\s+decir)\s+/i, '')
-                .replace(/^(?:un|una|el|la|los|las|de|del)\s+/i, '')
+            let cleanKey = query.toLowerCase()
+                .replace(/[?¿!¡,.;:()_"'«»]/g, ' ')
+                .replace(/\s+/g, ' ')
                 .trim();
 
-            const stopWords = [
+            // Quitar fórmulas interrogativas, de deseo y de cortesía típicas de niños
+            cleanKey = cleanKey
+                .replace(/^(?:quiero|me gustaría|podrías|puedes|por favor|deseo)\s+(?:ver|saber|conocer|escuchar|buscar|mostrar|enseñar|aprender)\s+/i, '')
+                .replace(/^(?:cu[aá]l|cu[aá]les)\s+(?:es|era|son|eran|fue|fueron)\s+(?:el|la|los|las|un|una|de|del)?\s*/i, '')
+                .replace(/^(?:qu[eé]|qui[eé]n|qui[eé]nes|c[oó]mo|d[oó]nde|por\s+qu[eé]|cu[aá]nto|cu[aá]ntos|cu[aá]nta|cu[aá]ntas)\s+(?:es|era|son|eran|fue|fueron|significa|quiere\s+decir)\s+(?:el|la|los|las|un|una|de|del)?\s*/i, '')
+                .replace(/^(?:dime|cu[eé]ntame|expl[ií]came|h[aá]blame|mu[eé]strame|ens[eé]ñame)\s+(?:sobre|de|del|acerca\s+de)?\s*/i, '')
+                .replace(/^(?:todos?\s+los?|todas?\s+las?|cada\s+uno\s+de\s+los?)\s*/i, '')
+                .replace(/^(?:el|la|los|las|un|una|unos|unas|de|del)\s+/i, '')
+                .trim();
+
+            const stopWords = new Set([
                 'cuantos', 'cuanto', 'cuanta', 'cuantas', 'anos', 'años', 'tiene', 'la', 'el', 'los', 'las',
-                'de', 'del', 'un', 'una', 'en', 'que', 'qué', 'es', 'era', 'son', 'por', 'como', 'cómo',
-                'donde', 'dónde', 'gloop', 'hola', 'oye', 'dime', 'sabes', 'cuentame', 'cuéntame',
-                'explicame', 'explícame', 'hablame', 'háblame', 'sobre', 'acerca', 'significa'
-            ];
-            const searchWords = cleanKey.split(/\s+/).filter(w => !stopWords.includes(w));
+                'de', 'del', 'al', 'un', 'una', 'unos', 'unas', 'en', 'que', 'qué', 'es', 'era', 'son', 'eran',
+                'fue', 'fueron', 'por', 'como', 'cómo', 'donde', 'dónde', 'gloop', 'hola', 'oye', 'dime',
+                'sabes', 'cuentame', 'cuéntame', 'explicame', 'explícame', 'hablame', 'háblame', 'sobre',
+                'acerca', 'significa', 'quiero', 'ver', 'todas', 'todos', 'cual', 'cuál', 'cuales', 'cuáles',
+                'quien', 'quién', 'quienes', 'quiénes', 'mostrar', 'muestra', 'muestrame', 'muéstrame',
+                'enseñar', 'enseña', 'enseñame', 'enséñame', 'para', 'con', 'sin', 'mas', 'más', 'pero'
+            ]);
+            const searchWords = cleanKey.split(/\s+/).filter(w => !stopWords.has(w) && w.length > 1);
             const searchQuery = searchWords.length > 0 ? searchWords.join(' ') : cleanKey || query;
+
+            // Función de validación de relevancia temática para evitar falsos positivos de Xapian en el ZIM
+            function findBestZimMatch(results, words, cleanQ) {
+                if (!Array.isArray(results) || results.length === 0) return null;
+                const normQ = cleanQ.toLowerCase();
+
+                // 1º Buscar coincidencia directa exacta o contenida en el título
+                for (const item of results) {
+                    if (!item || !item.title) continue;
+                    const t = item.title.toLowerCase();
+                    if (t === normQ || t.includes(normQ) || normQ.includes(t)) {
+                        return item;
+                    }
+                }
+
+                // 2º Calcular puntuación de coincidencia por número de palabras clave en el título
+                let bestItem = null;
+                let maxMatchedTokens = 0;
+
+                for (const item of results) {
+                    if (!item || !item.title) continue;
+                    const titleTokens = item.title.toLowerCase().split(/[\s_()\-–]+/).filter(x => x.length > 2);
+                    let matchedCount = 0;
+
+                    for (const w of words) {
+                        if (w.length < 3) continue;
+                        if (titleTokens.some(tt => tt === w || tt.startsWith(w) || w.startsWith(tt))) {
+                            matchedCount++;
+                        }
+                    }
+
+                    // Exigir que si hay varias palabras clave, al menos coincida la mitad o la principal
+                    if (matchedCount > 0 && matchedCount > maxMatchedTokens) {
+                        maxMatchedTokens = matchedCount;
+                        bestItem = item;
+                    }
+                }
+
+                if (bestItem && (maxMatchedTokens >= Math.ceil(words.length / 2) || maxMatchedTokens >= 1 && words.length <= 2)) {
+                    return bestItem;
+                }
+
+                // Si ninguno coincide claramente en el título y solo son menciones secundarias en texto largo, descartar
+                return null;
+            }
 
             try {
                 // 4. Revisar si ya lo había aprendido y memorizado en disco previamente
@@ -1632,26 +1688,27 @@
                     return;
                 }
 
-                // 5. Buscar en la enciclopedia local Vikidia (ZIM offline ultrarrápido)
+                // 5. Buscar en la enciclopedia local Vikidia (ZIM offline ultrarrápido con filtro de relevancia)
                 let foundLocal = false;
                 if (window.gloopAPI && window.gloopAPI.searchVikidia) {
                     try {
                         let data = await window.gloopAPI.searchVikidia(searchQuery);
-                        if (!data || !data.found || !data.results || data.results.length === 0) {
-                            if (searchWords.length > 1) {
-                                // Reintentar con el sustantivo principal
-                                data = await window.gloopAPI.searchVikidia(searchWords[searchWords.length - 1]);
-                            }
+                        let bestMatch = data && data.found && data.results ? findBestZimMatch(data.results, searchWords, cleanKey) : null;
+
+                        if (!bestMatch && searchWords.length > 1) {
+                            // Reintentar con el sustantivo principal
+                            const retryWord = searchWords[searchWords.length - 1];
+                            data = await window.gloopAPI.searchVikidia(retryWord);
+                            bestMatch = data && data.found && data.results ? findBestZimMatch(data.results, [retryWord], retryWord) : null;
                         }
 
                         if (currentQueryId !== activeQueryId) return;
 
-                        if (data && data.found && data.results && data.results.length > 0) {
-                            const first = data.results[0];
-                            const response = personality.craftResponse(query, first.title, first.snippet, first.imagePath);
+                        if (bestMatch) {
+                            const response = personality.craftResponse(query, bestMatch.title, bestMatch.snippet, bestMatch.imagePath);
                             if (currentQueryId !== activeQueryId) return;
                             speak(response.speechText, 'vikidia');
-                            showIllustration(first.imagePath, `Ilustración: ${first.title}`);
+                            showIllustration(bestMatch.imagePath, `Ilustración: ${bestMatch.title}`);
                             foundLocal = true;
                         }
                     } catch (e) {

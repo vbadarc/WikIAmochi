@@ -68,27 +68,40 @@ export class AndroidZimBridge {
         if (!ok) return { error: 'La bóveda enciclopédica aún se está preparando.', found: false };
 
         try {
-            let searchResult = await this.callWorker({
-                action: 'searchWithSnippets',
-                text: query,
-                numResults: 3
-            });
+            let rawResults = [];
 
-            let rawResults = (searchResult && searchResult.results) ? searchResult.results : [];
+            // 1º Intentar búsqueda por títulos directos con suggest (índice B-tree ultrapreciso)
+            try {
+                const sug = await this.callWorker({ action: 'suggest', text: query, numResults: 5 });
+                if (sug && sug.suggestions && sug.suggestions.length > 0) {
+                    const normQ = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                    const topMatch = sug.suggestions.find(s => {
+                        const sTitle = (s.title || s.path || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                        return sTitle === normQ || sTitle.startsWith(normQ) || normQ.startsWith(sTitle);
+                    }) || sug.suggestions[0];
 
-            if (rawResults.length === 0) {
-                try {
-                    const sug = await this.callWorker({ action: 'suggest', text: query, numResults: 3 });
-                    if (sug && sug.suggestions && sug.suggestions.length > 0) {
-                        const topSug = sug.suggestions[0].title || sug.suggestions[0].path;
-                        searchResult = await this.callWorker({
+                    if (topMatch) {
+                        const topTarget = topMatch.title || topMatch.path;
+                        const sRes = await this.callWorker({
                             action: 'searchWithSnippets',
-                            text: topSug,
-                            numResults: 3
+                            text: topTarget,
+                            numResults: 5
                         });
-                        rawResults = (searchResult && searchResult.results) ? searchResult.results : [];
+                        if (sRes && sRes.results && sRes.results.length > 0) {
+                            rawResults = sRes.results;
+                        }
                     }
-                } catch (e) {}
+                }
+            } catch (e) {}
+
+            // 2º Si suggest no arrojó resultados, usar búsqueda de texto completo con snippets
+            if (rawResults.length === 0) {
+                const searchResult = await this.callWorker({
+                    action: 'searchWithSnippets',
+                    text: query,
+                    numResults: 6
+                });
+                rawResults = (searchResult && searchResult.results) ? searchResult.results : [];
             }
 
             const results = [];

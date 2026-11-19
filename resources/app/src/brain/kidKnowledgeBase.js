@@ -67,6 +67,41 @@ export const KID_CURATED_ANSWERS = [
     },
     {
         patterns: [
+            /octavo planeta/i,
+            /cu[aá]l es el [uú]ltimo planeta/i,
+            /planeta n[uú]mero 8/i
+        ],
+        title: "Neptuno, el Octavo Planeta",
+        answer: "¡El octavo planeta de nuestro Sistema Solar es Neptuno! Es el planeta más lejano al Sol, un gigante de hielo de un hermoso color azul brillante con vientos súper veloces y temperaturas muy heladas.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Earth_Western_Hemisphere.jpg",
+        imageCaption: "Neptuno, el octavo planeta del Sistema Solar",
+        mood: "amazed"
+    },
+    {
+        patterns: [
+            /bandera de jap[oó]n/i,
+            /c[oó]mo es la bandera de jap[oó]n/i
+        ],
+        title: "La Bandera de Japón",
+        answer: "¡La bandera de Japón se llama Hinomaru! Es muy bonita y elegante: tiene un fondo blanco con un gran círculo de color rojo brillante justo en el centro, el cual representa al Sol naciente.",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Earth_Western_Hemisphere.jpg",
+        imageCaption: "La bandera de Japón con el círculo rojo del Sol",
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /todas las banderas/i,
+            /banderas del mundo/i,
+            /ver banderas/i
+        ],
+        title: "Las Banderas del Mundo",
+        answer: "¡Las banderas son símbolos coloridos y mágicos que representan a cada país y a su gente! Cada bandera tiene colores, estrellas o escudos con historias únicas. ¡Dime el nombre de cualquier país y te contaré cómo es su bandera!",
+        imagePath: "_assets_/0c70a452f799bfe840676ee341124611/Earth_Western_Hemisphere.jpg",
+        imageCaption: "Banderas que representan a los países del mundo",
+        mood: "curious"
+    },
+    {
+        patterns: [
             /por qu[eé] brillan las estrellas/i,
             /qu[eé] son las estrellas/i
         ],

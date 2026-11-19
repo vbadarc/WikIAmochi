@@ -130,22 +130,43 @@ export class OnlineLearner {
             const timeoutId = setTimeout(() => controller.abort(), 3500);
 
             const encoded = encodeURIComponent(cleanQuery);
-            const url = `${this.vikidiaApiUrl}?action=query&format=json&prop=extracts|pageimages&exintro=1&explaintext=1&pithumbsize=400&titles=${encoded}&origin=*`;
+            let url = `${this.vikidiaApiUrl}?action=query&format=json&prop=extracts|pageimages&exintro=1&explaintext=1&pithumbsize=400&titles=${encoded}&origin=*`;
             
-            const response = await fetch(url, { signal: controller.signal });
+            let response = await fetch(url, { signal: controller.signal });
+            if (!response.ok) {
+                clearTimeout(timeoutId);
+                return null;
+            }
+
+            let data = await response.json();
+            let pages = data.query?.pages;
+            let firstKey = pages ? Object.keys(pages)[0] : null;
+
+            // Si no existe con el título exacto, buscar el artículo más relevante en Vikidia
+            if (!pages || firstKey === '-1') {
+                const searchUrl = `${this.vikidiaApiUrl}?action=query&list=search&srsearch=${encoded}&format=json&origin=*&srlimit=1`;
+                const searchRes = await fetch(searchUrl, { signal: controller.signal });
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    const topResult = searchData.query?.search?.[0];
+                    if (topResult && topResult.title) {
+                        const topEncoded = encodeURIComponent(topResult.title);
+                        url = `${this.vikidiaApiUrl}?action=query&format=json&prop=extracts|pageimages&exintro=1&explaintext=1&pithumbsize=400&titles=${topEncoded}&origin=*`;
+                        response = await fetch(url, { signal: controller.signal });
+                        if (response.ok) {
+                            data = await response.json();
+                            pages = data.query?.pages;
+                            firstKey = pages ? Object.keys(pages)[0] : null;
+                        }
+                    }
+                }
+            }
+
             clearTimeout(timeoutId);
-
-            if (!response.ok) return null;
-
-            const data = await response.json();
-            const pages = data.query?.pages;
-            if (!pages) return null;
-
-            const firstKey = Object.keys(pages)[0];
-            if (firstKey === '-1') return null; // No existe la entrada
+            if (!pages || firstKey === '-1') return null;
 
             const page = pages[firstKey];
-            if (!page.extract || page.extract.length < 25) return null;
+            if (!page || !page.extract || page.extract.length < 25) return null;
 
             return {
                 title: page.title,
@@ -168,12 +189,31 @@ export class OnlineLearner {
             const timeoutId = setTimeout(() => controller.abort(), 3500);
 
             const encoded = encodeURIComponent(cleanQuery);
-            const url = `${this.wikipediaApiUrl}${encoded}`;
+            let url = `${this.wikipediaApiUrl}${encoded}`;
             
-            const response = await fetch(url, {
+            let response = await fetch(url, {
                 signal: controller.signal,
                 headers: { 'Accept': 'application/json' }
             });
+
+            // Si no existe con el título exacto, buscar con la API de búsqueda de Wikipedia
+            if (!response.ok || response.status === 404) {
+                const searchUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&format=json&origin=*&srlimit=1`;
+                const searchRes = await fetch(searchUrl, { signal: controller.signal });
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    const topResult = searchData.query?.search?.[0];
+                    if (topResult && topResult.title) {
+                        const topEncoded = encodeURIComponent(topResult.title);
+                        url = `${this.wikipediaApiUrl}${topEncoded}`;
+                        response = await fetch(url, {
+                            signal: controller.signal,
+                            headers: { 'Accept': 'application/json' }
+                        });
+                    }
+                }
+            }
+
             clearTimeout(timeoutId);
 
             if (!response.ok) return null;
