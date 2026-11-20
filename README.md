@@ -1,54 +1,68 @@
-# 🌟 WikIAmochi - Enciclopedia Tamagotchi Autónoma
+# 🌟 WikIAmochi - Enciclopedia Inteligente Infantil
 
-> **Una experiencia interactiva y educativa diseñada para niños.**  
-> 100% Autónoma, Segura y Offline por defecto con física de gelatina 2.5D, voz de caricatura Web Audio y enciclopedia infantil.
-
----
-
-## 🎯 Arquitectura de Código Único (Windows + Android)
-
-WikIAmochi está diseñado bajo el principio de **Single Source of Truth (Fuente Única de la Verdad)**:
-- **`resources/app/`**: Contiene el 100% del código de la aplicación (Canvas HTML5, físicas del slime, sintetizador procedimental de voz, cerebro infantil y base de conocimiento).
-- **Cualquier mejora o cambio realizado en `resources/app/` se refleja inmediatamente tanto en la versión de Windows como en la de Android.**
+> **Una experiencia interactiva y educativa diseñada para niños de 4 a 12 años y sus familias.**  
+> 100% Autónoma, Segura y Offline por defecto con física interactiva en Canvas 2D, síntesis de voz adaptada y la enciclopedia escolar infantil Vikidia en español.
 
 ---
 
-## 🖥️ Ejecución en Windows
+## 🎯 Filosofía del Proyecto y Arquitectura de Código Único
 
-Para desarrollo o ejecución directa:
+WikIAmochi está desarrollado bajo el principio de **Single Source of Truth (Fuente Única de la Verdad)** para escritorio y dispositivos móviles:
+- **`resources/app/`**: Contiene la totalidad del motor de la aplicación (Canvas HTML5, físicas elásticas del personaje Mochi, sintetizador procedimental de voz, cerebro infantil y catálogo de conocimiento).
+- **Multiplataforma:** La misma base de código se ejecuta en **Windows (Electron)** y en **Android (Capacitor 8)** sin duplicación de lógica ni divergencias de comportamiento.
+
+---
+
+## 🛡️ Privacidad y Seguridad Infantil
+
+- **100% Desconectada por defecto (Offline):** La aplicación no requiere conexión a internet para funcionar. Las consultas se realizan sobre un archivo local ZIM de Vikidia empaquetado en el almacenamiento del dispositivo.
+- **Sin Publicidad ni Compras:** 0 anuncios, 0 micropagos, 0 rastreadores (`AD_ID` no utilizado).
+- **Zona de Familias Protegida por PIN:** El acceso a los ajustes avanzados, activación del modo online supervisado y el borrado de memoria requieren un PIN de 4 dígitos creado por el adulto, con un reto matemático de dos cifras para recuperación en caso de olvido.
+- **Derecho al Olvido Directo:** Botón de borrado total en los ajustes de adultos que reinicia la memoria y preferencias a estado de fábrica.
+- **Política de Privacidad pública:** Consultable en [vbadarc.github.io/WikIAmochi/politica-privacidad.html](https://vbadarc.github.io/WikIAmochi/politica-privacidad.html).
+
+---
+
+## 🖥️ Ejecución en Escritorio (Windows)
+
+Para ejecutar la aplicación en entorno de desarrollo con Electron:
 ```bash
 npm start
 ```
-O simplemente haciendo doble clic sobre el ejecutable:
+O ejecutando directamente el binario compilado:
 ```text
-Gloop Enciclopedia.exe
+WikIAmochi.exe
 ```
 
 ---
 
 ## 📱 Compilación para Android (Google Play Store)
 
-El proyecto utiliza **Capacitor** para empaquetar el código compartido en una app nativa de Android de alto rendimiento:
+El empaquetado nativo para Android se gestiona a través de **Capacitor 8**:
 
-1. **Instalar dependencias de desarrollo:**
+1. **Construir y sincronizar los activos web:**
    ```bash
-   npm install
+   npm run build:web
+   npx cap copy android
    ```
 
-2. **Inicializar y sincronizar la plataforma Android:**
-   ```bash
-   npx cap add android
-   npx cap sync android
+2. **Compilar el paquete de producción (AAB):**
+   ```powershell
+   $env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+   cd android
+   .\gradlew.bat bundleRelease
    ```
 
-3. **Abrir en Android Studio para generar el APK / AAB:**
-   ```bash
-   npx cap open android
-   ```
+El archivo resultante (`app-release.aab`) se genera optimizado con R8 y reducción de recursos (Resource Shrinking), listo para ser firmado mediante el almacén seguro de claves especificado en `android/keystore.properties`.
+
+Consulte [RELEASE.md](RELEASE.md) para la guía completa de firma y publicación.
 
 ---
 
-## 🔒 Privacidad y Modo 100% Offline
-- **Modo Offline:** Por defecto, WikIAmochi consulta la enciclopedia local sin tocar internet.
-- **PIN de 4 dígitos (Opcional):** Permite a los padres bloquear el paso a Modo Online Híbrido mediante el candado superior (`🔓` / `🔒`).
+## 📜 Licencias y Créditos
 
+- **Código fuente de WikIAmochi:** Licenciado bajo la **GNU General Public License v3.0 (GPLv3)**.
+- **Contenidos enciclopédicos:** Procedentes de **Vikidia en español**, bajo licencia **Creative Commons Atribución-CompartirIgual 3.0 (CC BY-SA 3.0)** y Wikimedia Commons.
+- **Lector ZIM:** Basado en la tecnología de **libzim** y Kiwix (LGPLv3 / GPLv3).
+
+Para más detalles, consulte [LICENCIAS_Y_ATRIBUCIONES.md](docs/legal/LICENCIAS_Y_ATRIBUCIONES.md).

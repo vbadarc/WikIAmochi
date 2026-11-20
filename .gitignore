@@ -35,7 +35,9 @@ android/app/src/main/assets/capacitor.plugins.json
 *.keystore
 *.jks
 keystore.properties
+android/keystore.properties
 local.properties
+android/local.properties
 
 # Compilación Android / Gradle
 android/build/
@@ -49,12 +51,10 @@ android/captures/
 *.log
 .DS_Store
 Thumbs.db
-\
 
 .gradle_home/
 tools/bundletool.jar
 tools/*.apks
-
 tools/*.jar
 tools/*.keystore
 tools/*.json

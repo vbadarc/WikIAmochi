@@ -35,9 +35,9 @@ Para que Gradle firme automáticamente la compilación de release sin exponer cr
 
 ```properties
 storeFile=../wikiamochi-release.keystore
-storePassword=TU_CONTRASENA_AQUI
+storePassword=*****
 keyAlias=wikiamochi
-keyPassword=TU_CONTRASENA_AQUI
+keyPassword=*****
 ```
 
 *Nota:* Si el archivo `keystore.properties` no existe, Gradle compilará automáticamente una versión de release **sin firmar** (`unsigned`).
