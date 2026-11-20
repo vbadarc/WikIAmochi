@@ -62,3 +62,8 @@ tools/*.tmp
 tools/*.cjs
 tools/*.png
 tools/temp-test.*
+
+# Paquetes locales y extraccion de bundletool
+*.apks
+tools/universal_extracted/
+
