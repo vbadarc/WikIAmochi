@@ -112,14 +112,14 @@ export class NaturalVoiceService {
             try {
                 this.currentSource.stop();
                 this.currentSource.disconnect();
-            } catch (e) {}
+            } catch (e) { }
             this.currentSource = null;
         }
 
         if (this.capTTS) {
             try {
                 this.capTTS.stop();
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if ('speechSynthesis' in window) {
@@ -225,7 +225,7 @@ export class NaturalVoiceService {
                         return audioBuffer;
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
             return null;
         })().finally(() => {
             this.inflightPromises.delete(cacheKey);
@@ -342,7 +342,7 @@ export class NaturalVoiceService {
             const customRate = localStorage.getItem('wikia_rate_' + effectiveStyle);
             if (customPitch !== null && !isNaN(parseFloat(customPitch))) pitch = parseFloat(customPitch);
             if (customRate !== null && !isNaN(parseFloat(customRate))) rate = parseFloat(customRate);
-        } catch (e) {}
+        } catch (e) { }
 
         // Si viene de una prueba interactiva en tiempo real del engranaje
         if (testOptions) {

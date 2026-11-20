@@ -1,0 +1,11 @@
+{
+    "java.import.gradle.enabled": false,
+    "gradle.autoDetect": "off",
+    "java.import.exclusions": [
+        "**/node_modules/**",
+        "**/.metadata/**",
+        "**/archetype/**",
+        "**/META-INF/maven/**",
+        "**/android/**"
+    ]
+}
