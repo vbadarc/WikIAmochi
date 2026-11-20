@@ -4,7 +4,7 @@
 **Categoría de IARC:** Referencia / Noticias o Educación  
 **Desarrollador:** VicThor Dev (`vjbadenassepe@gmail.com`)  
 
-Guía paso a paso para responder el cuestionario oficial de la Coalición Internacional de Calificación por Edad (IARC) en Google Play Console:
+Guía paso a paso con las respuestas exactas que deben introducirse en el cuestionario oficial de la International Age Rating Coalition (IARC) dentro de Google Play Console. El sistema IARC determina automáticamente las calificaciones por edad en base a estas respuestas:
 
 ---
 
@@ -58,9 +58,5 @@ Guía paso a paso para responder el cuestionario oficial de la Coalición Intern
 
 ---
 
-## 8. Resultado Esperado de la Calificación IARC
-- **PEGI:** **PEGI 3** (Apto para todas las edades).
-- **ESRB:** **Everyone (E)**.
-- **USK:** **USK 0**.
-- **ClassInd (Brasil):** **Livre**.
-- **ACB (Australia):** **General (G)**.
+## 8. Determinación Oficial de la Calificación por el Sistema IARC
+Una vez completado el cuestionario en Play Console con las respuestas anteriores (todas negativas en contenidos sensibles), el motor de IARC calcula y asigna los certificados oficiales correspondientes a cada región regulatoria (PEGI en Europa, ESRB en Norteamérica, USK en Alemania, ClassInd en Brasil, etc.) para su inclusión automática en la ficha de la tienda.

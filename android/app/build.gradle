@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+def keystorePropsFile = rootProject.file('keystore.properties')
+if (!keystorePropsFile.exists()) {
+    keystorePropsFile = file('keystore.properties')
+}
+
 android {
     namespace = "com.wikiamochi.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -8,7 +13,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -20,10 +25,28 @@ android {
     androidResources {
         noCompress 'zim'
     }
+
+    signingConfigs {
+        release {
+            if (keystorePropsFile.exists()) {
+                def props = new Properties()
+                keystorePropsFile.withInputStream { stream -> props.load(stream) }
+                storeFile file(props['storeFile'])
+                storePassword props['storePassword']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (keystorePropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }

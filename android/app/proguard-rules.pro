@@ -1,21 +1,22 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Reglas de optimización y ofuscación de ProGuard / R8 para WikIAmochi
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# 1. Preservar Clases y Métodos de Capacitor
+-keep public class com.getcapacitor.** { *; }
+-keep public class * extends com.getcapacitor.Plugin
+-keep public class * extends com.getcapacitor.Bridge
+-keep public class * extends com.getcapacitor.BridgeActivity
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 2. Preservar interfaces de JavaScript y anotaciones de plugins
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+    @com.getcapacitor.PluginMethod <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 3. Plugins Comunitarios Oficiales (Voz y Reconocimiento)
+-keep class com.getcapacitor.community.speechrecognition.** { *; }
+-keep class com.getcapacitor.community.tts.** { *; }
+-keep class androidx.core.splashscreen.** { *; }
+
+# 4. Atributos esenciales para depuración y trazas seguras
+-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable
+-dontwarn com.getcapacitor.**

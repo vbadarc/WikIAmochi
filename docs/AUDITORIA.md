@@ -18,7 +18,7 @@ La aplicación WikIAmochi opera bajo el principio de **Privacidad desde el Dise�
 | `gloop_parent_pin` | Cadena (4 dígitos) | `Preferences` / `localStorage` | Código numérico de seguridad configurado por el padre/tutor. | **NO (100% Local)** |
 | `gloop_theme_color` | Cadena (ej: `#00E676`) | `Preferences` / `localStorage` | Color cosmético del personaje Mochi seleccionado por el niño. | **NO (100% Local)** |
 | `gloop_voice_profile` | Cadena (identificador de personaje) | `Preferences` / `localStorage` | Personalidad vocal elegida (Flubber, Toon, Kid Soft). | **NO (100% Local)** |
-| `gloop_voice_rate_*` / `gloop_voice_pitch_*` | Números decimales | `Preferences` / `localStorage` | Calibración acústica de tono y velocidad por voz. | **NO (100% Local)** |
+| `gloop_voice_rate_*` / `gloop_voice_pitch_*` | Números decimales | `Preferences` / `localStorage` | Calibración acústica de tono y velocidad por voz (solo en builds debug). | **NO (100% Local)** |
 | `gloop_known_topics` | Lista JSON de cadenas | `Preferences` / `localStorage` | Temas consultados previamente para ofrecer sugerencias de lectura infantiles en pantalla. | **NO (100% Local)** |
 
 ---
@@ -43,8 +43,7 @@ La aplicación WikIAmochi opera bajo el principio de **Privacidad desde el Dise�
   - Permiso estándar de Android para capturar el audio cuando el usuario pulsa activamente el botón del micrófono.
   - **Uso bajo demanda:** No escucha en segundo plano ni graba audio de forma continua. La captura finaliza inmediatamente al recibir el texto reconocido o al bloquearse la pantalla / pasar la app a segundo plano (`visibilitychange`).
 - **Naturaleza del motor `SpeechRecognizer`:**  
-  - En dispositivos Android estándar, el reconocimiento de voz delega en el servicio del sistema (`com.google.android.googlequicksearchbox` de Google). Dependiendo de si el dispositivo tiene descargados los paquetes de voz sin conexión, el audio puede ser procesado localmente o enviado a los servidores de reconocimiento de Google bajo los términos de servicio de Google Speech Services.
-  - Esta característica se documenta con absoluta transparencia tanto en la Política de Privacidad como en el formulario de Seguridad de los Datos (Data Safety) de Google Play.
+  - En dispositivos Android estándar, el reconocimiento de voz delega en el servicio del sistema (`com.google.android.googlequicksearchbox` de Google). Dependiendo de si el dispositivo tiene descargados los paquetes de voz sin conexión, el audio puede ser procesado localmente o enviado a los servidores de reconocimiento de Google bajo los términos de servicio de Google Speech Services. Por ello, se declara con transparencia que el audio "puede enviarse a los servidores de Google".
 
 ---
 
@@ -60,16 +59,24 @@ La aplicación WikIAmochi opera bajo el principio de **Privacidad desde el Dise�
 
 ---
 
-## 5. Mediciones de Rendimiento y Memoria (RAM)
+## 5. Mediciones Reales de Memoria (RAM) y Rendimiento
 
-- **Medición de RAM en Dispositivo Físico (Xiaomi Redmi Note 8 Pro, Android 11 API 30):**
-  - **Inicio de la app:** ~173 MB PSS total.
-  - **Tras 10 búsquedas consecutivas:** ~256 MB PSS total (`dumpsys meminfo com.wikiamochi.app`).
-  - **Explicación técnica del incremento:** El aumento de 173 MB a 256 MB se debe enteramente al mapa de índices en memoria de `libzim-wasm.wasm`, el descompresor LZMA/ZSTD y el caché de decodificación de texturas de canvas (avatar Mochi renderizado a 60 FPS). La memoria se estabiliza de forma asintótica por debajo del umbral de advertencia del sistema (512 MB) y no presenta fugas de memoria (`memory leaks`).
-- **Tiempo de respuesta de la primera búsqueda:** ~420 ms (desde almacenamiento flash interno directo `A2_DIRECT_ASSET_FD`).
+Medición ejecutada sobre **dispositivo físico real**:
+- **Dispositivo:** Xiaomi Redmi Note 8 Pro (`cyu48hfu5de6emlv`, Android 11, API 30).
+- **Comando ejecutado:** `adb shell dumpsys meminfo com.wikiamochi.app`
+- **Registro de memoria capturado (en reposo tras arranque e interacción):**
+  - **Java Heap:** 13.724 KB
+  - **Native Heap:** 40.360 KB
+  - **Code (mmap):** 12.500 KB
+  - **Graphics (EGL/GL mtrack):** 79.049 KB
+  - **Private Other / System:** 28.551 KB
+  - **TOTAL PSS:** **175.888 KB** (~171,7 MB)
+  - **TOTAL RSS:** **308.701 KB**
+- **Comportamiento tras búsquedas:** Al realizar múltiples búsquedas consecutivas con visualización de artículos e imágenes ZIM, el PSS se sitúa en torno a ~256 MB debido a la retención de búferes gráficos de WebView y asignaciones activas de WebAssembly.
+- **Tiempo de respuesta de primera búsqueda:** ~420 ms desde almacenamiento flash local.
 
 ---
 
 ## 6. Conclusión de la Auditoría
 
-WikIAmochi cumple al 100% los requerimientos de privacidad infantil de Google Play Designed for Families, COPPA y normativas europeas, garantizando que los datos de los niños nunca son vendidos, compartidos ni explotados con fines comerciales.
+WikIAmochi cumple los requerimientos de privacidad infantil de Google Play Designed for Families, COPPA y normativas europeas, garantizando que los datos de los niños nunca son vendidos, compartidos ni explotados con fines comerciales.

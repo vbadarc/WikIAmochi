@@ -277,31 +277,61 @@ export class NaturalVoiceService {
         this.sessionEngine = 'android-native';
 
         const effectiveStyle = (testOptions && testOptions.style) ? testOptions.style : this.voiceStyle;
-        let targetVoiceIndex = -1;
-        let appliedVoiceURI = 'default';
+        let appliedVoice = null;
         let pitch = 1.0;
         let rate = 1.0;
 
-        // Perfiles de voz base:
-        // 1. Flubber: Muñeco dulce, alegre y tierno
-        // 2. Ardillita: Aguda, ágil y vivaz (tipo cartoon)
-        // 3. Chiquillo: Tono infantil, suave y dulce
+        // Perfiles acústicos base por personaje:
+        // 1. cartoon_flubber: Muñeco dulce, alegre y tierno
+        // 2. cartoon_toon: Ardillita/dibujo ágil, aguda y vivaz
+        // 3. kid_soft: Voz infantil suave, pausada y dulce
         if (effectiveStyle === 'cartoon_toon') {
             pitch = 1.55;
             rate = 1.18;
-            targetVoiceIndex = this.androidVoices.length > 1 ? 1 : 0;
         } else if (effectiveStyle === 'kid_soft') {
             pitch = 1.28;
             rate = 0.96;
-            targetVoiceIndex = this.androidVoices.length > 2 ? 2 : 0;
         } else {
-            // cartoon_flubber (Muñeco dulce)
             pitch = 1.20;
             rate = 1.02;
-            targetVoiceIndex = 0;
         }
 
-        // Si el usuario configuró valores personalizados en el engranaje, aplicarlos
+        // Resolución dinámica de voz por nombre / voiceURI en tiempo de ejecución (no por índice)
+        // Prioriza coincidencias semánticas en español y recurre a fallback controlado es-ES
+        if (this.androidVoices && this.androidVoices.length > 0) {
+            const namePatterns = {
+                cartoon_toon: ['female', 'es-es-x-ana', 'es-es-x-eea', 'es-es-x-efc', 'es-us-x-sfb'],
+                kid_soft: ['soft', 'kid', 'child', 'es-es-x-eec', 'es-es-x-eed', 'es-us-x-sfd'],
+                cartoon_flubber: ['sweet', 'natural', 'es-es-x-eea', 'es-es-x-ana', 'es-es']
+            };
+            const patterns = namePatterns[effectiveStyle] || ['es-es', 'es'];
+
+            for (const p of patterns) {
+                const found = this.androidVoices.find(v => {
+                    const uri = (v.voiceURI || v.name || '').toLowerCase();
+                    return uri.includes(p);
+                });
+                if (found) {
+                    appliedVoice = found;
+                    break;
+                }
+            }
+
+            // Fallback 1: primera voz disponible en español de España (es-ES)
+            if (!appliedVoice) {
+                appliedVoice = this.androidVoices.find(v => (v.lang || '').toLowerCase().replace('_', '-').startsWith('es-es'));
+            }
+            // Fallback 2: cualquier voz disponible en español
+            if (!appliedVoice) {
+                appliedVoice = this.androidVoices.find(v => (v.lang || '').toLowerCase().startsWith('es'));
+            }
+            // Fallback 3: primera voz de la lista
+            if (!appliedVoice) {
+                appliedVoice = this.androidVoices[0];
+            }
+        }
+
+        // Si el usuario configuró valores personalizados en el engranaje (solo en builds debug), aplicarlos
         try {
             const customPitch = localStorage.getItem('wikia_pitch_' + effectiveStyle);
             const customRate = localStorage.getItem('wikia_rate_' + effectiveStyle);
@@ -315,24 +345,20 @@ export class NaturalVoiceService {
             if (typeof testOptions.rate === 'number') rate = testOptions.rate;
         }
 
-        if (this.androidVoices.length > 0 && targetVoiceIndex >= 0) {
-            const assigned = this.androidVoices[targetVoiceIndex] || this.androidVoices[0];
-            appliedVoiceURI = assigned.voiceURI || 'native-es';
-        }
-
+        const appliedVoiceURI = appliedVoice ? (appliedVoice.voiceURI || appliedVoice.name || 'native-es') : 'default-es-ES';
         console.log(`[AndroidTTS_APPLIED] style="${effectiveStyle}", voiceURI="${appliedVoiceURI}", pitch=${pitch.toFixed(2)}, rate=${rate.toFixed(2)}`);
 
         try {
             const speakParams = {
                 text: text,
-                lang: 'es-ES',
+                lang: appliedVoice ? (appliedVoice.lang || 'es-ES') : 'es-ES',
                 rate: rate,
                 pitch: pitch,
                 volume: 1.0,
                 category: 'ambient'
             };
-            if (targetVoiceIndex >= 0 && this.androidVoices[targetVoiceIndex]) {
-                speakParams.voice = this.androidVoices[targetVoiceIndex].globalIndex;
+            if (appliedVoice && typeof appliedVoice.globalIndex === 'number') {
+                speakParams.voice = appliedVoice.globalIndex;
             }
             await this.capTTS.speak(speakParams);
         } catch (e) {
