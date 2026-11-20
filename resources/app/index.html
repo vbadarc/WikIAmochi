@@ -201,11 +201,14 @@
         }
 
         canvas#gloopCanvas {
-            width: auto;
+            width: 100%;
             height: 100%;
-            max-width: 90vw;
+            max-width: 100%;
             max-height: 100%;
-            aspect-ratio: 1 / 1;
+            display: block;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
             cursor: grab;
             filter: drop-shadow(0 10px 20px rgba(0, 200, 83, 0.18));
             transition: filter 0.3s;
@@ -984,7 +987,7 @@
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Tono (Pitch): <b id="val_pitch_cartoon_flubber">1.20</b></span>
                                 </div>
-                                <input type="range" class="gear-pitch-slider" data-style="cartoon_flubber" min="0.60" max="1.80" step="0.05" value="1.20" style="width: 100%; margin-bottom: 8px;">
+                                <input type="range" class="gear-pitch-slider" data-style="cartoon_flubber" min="0.60" max="2.00" step="0.02" value="1.20" style="width: 100%; margin-bottom: 8px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Velocidad (Rate): <b id="val_rate_cartoon_flubber">1.02</b></span>
                                 </div>
@@ -1009,7 +1012,7 @@
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Tono (Pitch): <b id="val_pitch_cartoon_toon">1.55</b></span>
                                 </div>
-                                <input type="range" class="gear-pitch-slider" data-style="cartoon_toon" min="0.60" max="1.90" step="0.05" value="1.55" style="width: 100%; margin-bottom: 8px;">
+                                <input type="range" class="gear-pitch-slider" data-style="cartoon_toon" min="0.60" max="2.00" step="0.02" value="1.55" style="width: 100%; margin-bottom: 8px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Velocidad (Rate): <b id="val_rate_cartoon_toon">1.18</b></span>
                                 </div>
@@ -1034,7 +1037,7 @@
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Tono (Pitch): <b id="val_pitch_kid_soft">1.28</b></span>
                                 </div>
-                                <input type="range" class="gear-pitch-slider" data-style="kid_soft" min="0.60" max="1.80" step="0.05" value="1.28" style="width: 100%; margin-bottom: 8px;">
+                                <input type="range" class="gear-pitch-slider" data-style="kid_soft" min="0.60" max="2.00" step="0.02" value="1.28" style="width: 100%; margin-bottom: 8px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
                                     <span>Velocidad (Rate): <b id="val_rate_kid_soft">0.96</b></span>
                                 </div>
@@ -1042,6 +1045,31 @@
                                 <div style="display: flex; gap: 8px;">
                                     <button class="btn-gear-test" data-style="kid_soft" style="flex: 1; padding: 6px; background: #43A047; color: white; border: none; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;">▶️ Probar</button>
                                     <button class="btn-gear-reset" data-style="kid_soft" data-default-pitch="1.28" data-default-rate="0.96" style="padding: 6px 10px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; cursor: pointer;">Restablecer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opción 4: Duendecillo Chispa (Ultra-Aguda) -->
+                        <div class="voice-card-row" id="card_cartoon_pixie" style="background: white; border-radius: 16px; border: 2px solid #ECEFF1; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;">
+                                <div class="voice-select-trigger" data-style="cartoon_pixie" style="flex: 1; cursor: pointer;">
+                                    <div style="font-weight: 700; color: #E65100; font-size: 14px;">🐭 Duendecillo / Chispa</div>
+                                    <div style="font-size: 11px; color: #546E7A;">Tono ultra-agudo, travieso y vivaz</div>
+                                </div>
+                                <button class="btn-voice-gear" data-target="gear_cartoon_pixie" style="background: none; border: none; font-size: 18px; padding: 6px; cursor: pointer;" title="Ajustar tono y velocidad">⚙️</button>
+                            </div>
+                            <div class="voice-gear-panel" id="gear_cartoon_pixie" style="display: none; background: #FFF8E1; border-top: 1px dashed #FFE082; padding: 10px 14px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Tono (Pitch): <b id="val_pitch_cartoon_pixie">1.85</b></span>
+                                </div>
+                                <input type="range" class="gear-pitch-slider" data-style="cartoon_pixie" min="0.60" max="2.00" step="0.02" value="1.85" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #37474F; margin-bottom: 2px;">
+                                    <span>Velocidad (Rate): <b id="val_rate_cartoon_pixie">1.15</b></span>
+                                </div>
+                                <input type="range" class="gear-rate-slider" data-style="cartoon_pixie" min="0.60" max="1.60" step="0.05" value="1.15" style="width: 100%; margin-bottom: 8px;">
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-gear-test" data-style="cartoon_pixie" style="flex: 1; padding: 6px; background: #FF9800; color: white; border: none; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;">▶️ Probar</button>
+                                    <button class="btn-gear-reset" data-style="cartoon_pixie" data-default-pitch="1.85" data-default-rate="1.15" style="padding: 6px 10px; background: white; border: 1px solid #B0BEC5; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 11px; cursor: pointer;">Restablecer</button>
                                 </div>
                             </div>
                         </div>
@@ -1366,7 +1394,8 @@
             const cards = [
                 { id: 'card_cartoon_flubber', style: 'cartoon_flubber', color: 'var(--brand-blue)', bg: '#E1F5FE' },
                 { id: 'card_cartoon_toon', style: 'cartoon_toon', color: '#AB47BC', bg: '#F3E5F5' },
-                { id: 'card_kid_soft', style: 'kid_soft', color: '#43A047', bg: '#E8F5E9' }
+                { id: 'card_kid_soft', style: 'kid_soft', color: '#43A047', bg: '#E8F5E9' },
+                { id: 'card_cartoon_pixie', style: 'cartoon_pixie', color: '#FF9800', bg: '#FFF8E1' }
             ];
 
             cards.forEach(c => {
@@ -1384,7 +1413,7 @@
         }
 
         function initGearSliders() {
-            ['cartoon_flubber', 'cartoon_toon', 'kid_soft'].forEach(style => {
+            ['cartoon_flubber', 'cartoon_toon', 'kid_soft', 'cartoon_pixie'].forEach(style => {
                 const pitchSlider = document.querySelector(`.gear-pitch-slider[data-style="${style}"]`);
                 const rateSlider = document.querySelector(`.gear-rate-slider[data-style="${style}"]`);
                 const pitchLabel = document.getElementById(`val_pitch_${style}`);
@@ -1434,21 +1463,15 @@
                     speak('¡Hola amiguito! Soy Gloop. ¡Mi voz suena dulce, alegre y tierna!', 'curated');
                 } else if (style === 'cartoon_toon') {
                     speak('¡Yuju! ¡Esta es mi voz de ardillita rápida y risueña!', 'curated');
+                } else if (style === 'cartoon_pixie') {
+                    speak('¡Hola amiguito! ¡Soy Chispa el duendecillo! ¡Mi voz es súper aguda y divertida!', 'curated');
                 } else {
                     speak('¡Hola! Esta es mi voz suave y cariñosa de chiquillo.', 'curated');
                 }
             });
         });
 
-        // 2. Clic en el engranaje para abrir/cerrar ajustes finos
-                // Engranaje de calibración de voz: solo activo en modo debug
-        const isDebugMode = window.location.search.includes('debug=1') || localStorage.getItem('wikia_debug_mode') === 'true';
-        if (!isDebugMode) {
-            document.querySelectorAll('.btn-voice-gear, .voice-gear-panel').forEach(el => {
-                el.style.setProperty('display', 'none', 'important');
-            });
-        }
-
+        // 2. Clic en el engranaje para abrir/cerrar ajustes finos de velocidad y tono
         document.querySelectorAll('.btn-voice-gear').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -2169,7 +2192,7 @@
         // Validación o Creación de PIN
         btnToggleModeConfirm.addEventListener('click', async () => {
             const entered = inputPinCode.value.trim();
-            if (!/^d{4}$/.test(entered)) {
+            if (!/^\d{4}$/.test(entered)) {
                 pinFeedback.style.color = '#D32F2F';
                 pinFeedback.textContent = 'El PIN debe ser exactamente de 4 números.';
                 inputPinCode.focus();

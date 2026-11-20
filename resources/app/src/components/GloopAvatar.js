@@ -54,26 +54,38 @@ export class GloopAvatar {
         this.physics.onBounce = (speed) => this.playBounceSound(speed);
 
         this.canvas.style.cursor = 'grab';
+        this.canvas.style.touchAction = 'none';
 
         this.initSensors();
         this.initInteractions();
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', () => this.setupCanvasDpi(), { passive: true });
+        }
     }
 
     setupCanvasDpi() {
-        // En móviles con pantallas 1080x2340 (DPR 2.75 o 3.0), limitar la resolución interna del canvas
-        // a un tamaño contenido (320x320 o DPR máx 1.5) reduce el uso de memoria de textura de 176 MB a ~40 MB
+        // En móviles y escritorios, adaptar el ancho y alto del canvas al tamaño real del contenedor (100% ancho de pantalla)
+        // Limitar DPR a máx 1.5 para optimizar el rendimiento y memoria en pantallas 1080p+
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
         const rect = this.canvas.getBoundingClientRect();
-        const displayW = rect.width > 0 ? rect.width : 280;
-        const displayH = rect.height > 0 ? rect.height : 280;
+        const displayW = rect.width > 0 ? rect.width : (typeof window !== 'undefined' ? window.innerWidth : 360);
+        const displayH = rect.height > 0 ? rect.height : 220;
 
-        const internalSize = Math.round(Math.min(displayW, displayH) * dpr);
-        if (internalSize > 0 && (this.canvas.width !== internalSize || this.canvas.height !== internalSize)) {
-            this.canvas.width = internalSize;
-            this.canvas.height = internalSize;
-            this.width = internalSize;
-            this.height = internalSize;
-            this.baseRadius = Math.round(internalSize * 0.28);
+        const internalW = Math.round(displayW * dpr);
+        const internalH = Math.round(displayH * dpr);
+        if (internalW > 0 && internalH > 0 && (this.canvas.width !== internalW || this.canvas.height !== internalH)) {
+            this.canvas.width = internalW;
+            this.canvas.height = internalH;
+            this.width = internalW;
+            this.height = internalH;
+            this.baseRadius = Math.round(Math.min(internalW * 0.25, internalH * 0.36));
+
+            if (this.physics) {
+                // Límites de rebote elásticos exactos hasta los bordes de la pantalla
+                const boundX = Math.max(120, (this.width / 2) - this.baseRadius - 10);
+                const boundY = Math.max(60, (this.height / 2) - this.baseRadius - 10);
+                this.physics.setBounds(-boundX, boundX, -boundY, 0);
+            }
         }
     }
 
@@ -114,7 +126,7 @@ export class GloopAvatar {
 
             osc.start(now);
             osc.stop(now + 0.20);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     playSquishSound() {
@@ -141,7 +153,7 @@ export class GloopAvatar {
 
             osc.start(now);
             osc.stop(now + 0.12);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     initSensors() {
@@ -158,18 +170,21 @@ export class GloopAvatar {
     initInteractions() {
         const getLocalCoords = (clientX, clientY) => {
             const rect = this.canvas.getBoundingClientRect();
+            const scaleX = rect.width > 0 ? this.width / rect.width : 1;
+            const scaleY = rect.height > 0 ? this.height / rect.height : 1;
             return {
-                x: clientX - rect.left - this.width / 2,
-                y: clientY - rect.top - (this.height / 2 + 25)
+                x: (clientX - rect.left) * scaleX - this.width / 2,
+                y: (clientY - rect.top) * scaleY - (this.height / 2 + 10)
             };
         };
 
         this.canvas.addEventListener('pointerdown', (e) => {
             const coords = getLocalCoords(e.clientX, e.clientY);
             const distFromSlime = Math.hypot(coords.x - this.physics.x, coords.y - this.physics.y);
+            const grabRadius = Math.max(90, this.baseRadius * 1.15);
 
-            // Si el clic es sobre el cuerpo del slime (radio ~95px), agarrarlo
-            if (distFromSlime < 95) {
+            // Si el toque es sobre el cuerpo del slime, agarrarlo
+            if (distFromSlime < grabRadius) {
                 this.isUserDragging = true;
                 this.canvas.style.cursor = 'grabbing';
                 this.physics.startDrag(coords.x, coords.y);

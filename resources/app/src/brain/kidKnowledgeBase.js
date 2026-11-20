@@ -5,6 +5,61 @@
 export const KID_CURATED_ANSWERS = [
     {
         patterns: [
+            /^(?:¡?hola!?|hola\s+gloop|buenos\s+d[ií]as|buenas\s+tardes|buenas\s+noches|qu[eé]\s+tal|hey|saludos)(?:\s+gloop|\s+amigo|\s+amiguito)?$/i,
+            /^hola$/i,
+            /^hola\s+/i
+        ],
+        title: "¡Hola, amigo!",
+        answer: "¡Hola! ¡Qué alegría verte por aquí! Soy Gloop, tu amigo de gelatina saltarina. ¿Qué curiosidad o misterio del mundo quieres que descubramos juntos hoy? ¡Pregúntame sobre el espacio, los dinosaurios, animales o lo que tú quieras!",
+        imagePath: null,
+        imageCaption: null,
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /^(?:qui[eé]n\s+eres|c[oó]mo\s+te\s+llamas|qu[eé]\s+eres|cu[aá]l\s+es\s+tu\s+nombre)(?:\s+gloop)?$/i,
+            /qui[eé]n\s+es\s+gloop/i
+        ],
+        title: "Soy Gloop",
+        answer: "¡Soy Gloop! Una criatura mágica de gelatina inteligente. Me encanta rebotar por la pantalla, investigar en la gran enciclopedia infantil y ayudarte a descubrir cosas asombrosas del universo. ¡Tócame, hazme cosquillas o pregúntame lo que quieras!",
+        imagePath: null,
+        imageCaption: null,
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /^(?:c[oó]mo\s+est[aá]s|qu[eé]\s+tal\s+est[aá]s|est[aá]s\s+bien)(?:\s+gloop)?$/i,
+            /c[oó]mo\s+te\s+sientes/i
+        ],
+        title: "¿Cómo estás?",
+        answer: "¡Estoy súper contento y lleno de energía! Mis burbujas de gelatina no paran de saltar de la emoción. ¿Y tú, qué gran aventura quieres explorar conmigo hoy?",
+        imagePath: null,
+        imageCaption: null,
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /^(?:muchas\s+)?gracias(?:\s+gloop)?$/i,
+            /^(?:eres\s+genial|te\s+quiero|me\s+caes\s+bien|te\s+amo)(?:\s+gloop)?$/i
+        ],
+        title: "¡De nada, explorador!",
+        answer: "¡De nada, amiguito! ¡Tú sí que eres genial y un gran explorador! Me encanta acompañarte y aprender contigo todos los días.",
+        imagePath: null,
+        imageCaption: null,
+        mood: "happy"
+    },
+    {
+        patterns: [
+            /^(?:adi[oó]s|hasta\s+luego|chao|hasta\s+ma[nñ]ana|nos\s+vemos)(?:\s+gloop)?$/i
+        ],
+        title: "¡Hasta luego!",
+        answer: "¡Hasta luego, amiguito! Me quedaré descansando y soñando con nuevas aventuras. ¡Vuelve pronto a jugar y aprender!",
+        imagePath: null,
+        imageCaption: null,
+        mood: "sleepy"
+    },
+    {
+        patterns: [
             /cu[aá]ntos a[nñ]os tiene la tierra/i,
             /edad de la tierra/i,
             /cu[aá]ndo naci[oó] la tierra/i,

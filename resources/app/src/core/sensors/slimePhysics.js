@@ -32,7 +32,7 @@ export class SlimePhysics {
         this.maxX = 160;
         this.minY = -170;
         this.maxY = 0;
-        this.bounciness = 0.75;  // Coeficiente de rebote elástico
+        this.bounciness = 0.85;  // Coeficiente de rebote elástico ágil
 
         // Estado de agarre con el ratón / táctil
         this.isDragging = false;
@@ -114,14 +114,14 @@ export class SlimePhysics {
      */
     releaseDrag(throwVx = 0, throwVy = 0) {
         this.isDragging = false;
-        // Limitar velocidad de lanzamiento para física suave
-        this.vx = Math.max(-35, Math.min(35, throwVx * 1.1));
-        this.vy = Math.max(-35, Math.min(30, throwVy * 1.1));
+        // Permitir lanzamientos ágiles con inercia multiplicada
+        this.vx = Math.max(-50, Math.min(50, throwVx * 1.45));
+        this.vy = Math.max(-45, Math.min(30, throwVy * 1.45));
 
         const launchSpeed = Math.hypot(this.vx, this.vy);
-        if (launchSpeed > 14) {
+        if (launchSpeed > 10) {
             this.isDizzy = true;
-            this.dizzyTimer = 2.0;
+            this.dizzyTimer = 2.5;
             this.happiness = Math.min(100, this.happiness + 5);
         }
     }
@@ -221,9 +221,9 @@ export class SlimePhysics {
             if (this.x < this.minX) {
                 const impactSpeed = Math.abs(this.vx);
                 this.x = this.minX;
-                this.vx = -this.vx * this.bounciness;
-                this.scaleX = Math.max(0.60, this.scaleX - 0.30);
-                this.scaleY = Math.min(1.40, this.scaleY + 0.25);
+                this.vx = Math.abs(this.vx) * this.bounciness;
+                this.scaleX = Math.max(0.55, this.scaleX - 0.35);
+                this.scaleY = Math.min(1.45, this.scaleY + 0.30);
                 if (impactSpeed > 2 && this.onBounce) this.onBounce(impactSpeed);
             }
 
@@ -231,9 +231,9 @@ export class SlimePhysics {
             if (this.x > this.maxX) {
                 const impactSpeed = Math.abs(this.vx);
                 this.x = this.maxX;
-                this.vx = -this.vx * this.bounciness;
-                this.scaleX = Math.max(0.60, this.scaleX - 0.30);
-                this.scaleY = Math.min(1.40, this.scaleY + 0.25);
+                this.vx = -Math.abs(this.vx) * this.bounciness;
+                this.scaleX = Math.max(0.55, this.scaleX - 0.35);
+                this.scaleY = Math.min(1.45, this.scaleY + 0.30);
                 if (impactSpeed > 2 && this.onBounce) this.onBounce(impactSpeed);
             }
 
@@ -241,9 +241,9 @@ export class SlimePhysics {
             if (this.y < this.minY) {
                 const impactSpeed = Math.abs(this.vy);
                 this.y = this.minY;
-                this.vy = -this.vy * this.bounciness;
-                this.scaleY = Math.max(0.65, this.scaleY - 0.28);
-                this.scaleX = Math.min(1.35, this.scaleX + 0.22);
+                this.vy = Math.abs(this.vy) * this.bounciness;
+                this.scaleY = Math.max(0.60, this.scaleY - 0.30);
+                this.scaleX = Math.min(1.40, this.scaleX + 0.25);
                 if (impactSpeed > 2 && this.onBounce) this.onBounce(impactSpeed);
             }
 
@@ -259,9 +259,14 @@ export class SlimePhysics {
                     if (impactSpeed > 2.5 && this.onBounce) this.onBounce(impactSpeed);
                 } else {
                     this.vy = 0;
-                    // Resorte armónico hacia el centro del podio (0, 0)
-                    this.vx += (0 - this.x) * 0.06;
-                    this.vx *= 0.82;
+                    // Si aún tiene velocidad horizontal significativa, dejarlo rodar y rebotar libremente
+                    if (Math.abs(this.vx) > 1.2) {
+                        this.vx *= 0.988; // Deslizamiento suave de baja fricción
+                    } else {
+                        // Solo cuando se haya calmado, retorno elástico suave al centro del podio (0, 0)
+                        this.vx += (0 - this.x) * 0.05;
+                        this.vx *= 0.88;
+                    }
                 }
             }
         }

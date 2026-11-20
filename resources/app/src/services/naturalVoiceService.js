@@ -285,7 +285,11 @@ export class NaturalVoiceService {
         // 1. cartoon_flubber: Muñeco dulce, alegre y tierno
         // 2. cartoon_toon: Ardillita/dibujo ágil, aguda y vivaz
         // 3. kid_soft: Voz infantil suave, pausada y dulce
-        if (effectiveStyle === 'cartoon_toon') {
+        // 4. cartoon_pixie: Duendecillo chispa, súper agudo y travieso
+        if (effectiveStyle === 'cartoon_pixie') {
+            pitch = 1.85;
+            rate = 1.15;
+        } else if (effectiveStyle === 'cartoon_toon') {
             pitch = 1.55;
             rate = 1.18;
         } else if (effectiveStyle === 'kid_soft') {
@@ -300,6 +304,7 @@ export class NaturalVoiceService {
         // Prioriza coincidencias semánticas en español y recurre a fallback controlado es-ES
         if (this.androidVoices && this.androidVoices.length > 0) {
             const namePatterns = {
+                cartoon_pixie: ['female', 'high', 'es-es-x-efc', 'es-es-x-ana', 'es-es-x-eea', 'es-us-x-sfb'],
                 cartoon_toon: ['female', 'es-es-x-ana', 'es-es-x-eea', 'es-es-x-efc', 'es-us-x-sfb'],
                 kid_soft: ['soft', 'kid', 'child', 'es-es-x-eec', 'es-es-x-eed', 'es-us-x-sfd'],
                 cartoon_flubber: ['sweet', 'natural', 'es-es-x-eea', 'es-es-x-ana', 'es-es']
@@ -481,7 +486,10 @@ export class NaturalVoiceService {
         }
 
         // Modulación offline de personaje
-        if (this.voiceStyle === 'cartoon_toon' || this.voiceStyle === 'spark') {
+        if (this.voiceStyle === 'cartoon_pixie') {
+            utterance.pitch = 1.45;
+            utterance.rate = 1.15;
+        } else if (this.voiceStyle === 'cartoon_toon' || this.voiceStyle === 'spark') {
             utterance.pitch = 1.22;
             utterance.rate = 1.10;
         } else if (this.voiceStyle === 'kid_soft' || this.voiceStyle === 'kid') {
